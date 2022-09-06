@@ -4,7 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Data
@@ -13,6 +13,7 @@ public class User {
     @Email(message = "Email должен быть корректным адресом электронной почты.")
     private String email;
     @NotBlank(message = "Необходимо указать login.")
+    @Pattern(regexp = "^\\S*$")
     private String login;
     private String name;
     private LocalDate birthday;

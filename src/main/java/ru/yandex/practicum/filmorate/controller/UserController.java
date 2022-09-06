@@ -18,13 +18,12 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Map<Integer, User> users = new HashMap<>();
-    UserValidator userValidator = new UserValidator();
+    private UserValidator userValidator = new UserValidator();
     private final IdCounter idCounter = new IdCounter();
 
     @GetMapping
     public Collection<User> findAll() {
-        log.debug("Получен запрос GET /users.");
-        log.debug("Текущее количество пользователей: {}", users.size());
+        log.debug("Получен запрос GET /users.Текущее количество пользователей: {}", users.size());
         return users.values();
     }
 

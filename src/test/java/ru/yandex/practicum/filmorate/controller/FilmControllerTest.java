@@ -94,9 +94,8 @@ public class FilmControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof LongDescriptionException))
-                .andExpect(result -> assertEquals("Максимальная длина описания — 200 символов.",
-                        result.getResolvedException().getMessage()));
+                .andExpect(result
+                        -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
 
@@ -110,9 +109,8 @@ public class FilmControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NegativeDurationException))
-                .andExpect(result -> assertEquals("Продолжительность фильма должна быть положительной.",
-                        result.getResolvedException().getMessage()));
+                .andExpect(result
+                        -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
     @Test
@@ -125,9 +123,8 @@ public class FilmControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NegativeDurationException))
-                .andExpect(result -> assertEquals("Продолжительность фильма должна быть положительной.",
-                        result.getResolvedException().getMessage()));
+                .andExpect(result
+                        -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
     @Test

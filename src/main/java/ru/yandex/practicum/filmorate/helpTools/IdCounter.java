@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class IdCounter {
-    int id;
+    private int id;
 
     public int incrementIdCounter() {
         return ++id;

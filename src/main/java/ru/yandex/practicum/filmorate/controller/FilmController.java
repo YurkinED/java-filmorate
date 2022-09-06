@@ -22,8 +22,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.debug("Получен запрос GET /films.");
-        log.debug("Текущее количество фильмов: {}", films.size());
+        log.debug("Получен запрос GET /films. Текущее количество фильмов: {}", films.size());
         return films.values();
     }
 
