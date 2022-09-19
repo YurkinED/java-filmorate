@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -181,7 +182,7 @@ public class FilmControllerTest {
                 FILM_DURATION);
         Film film3 = new Film(3, "name", RandomString.make(200), TEST_DATE,
                 FILM_DURATION);
-        Mockito.when(filmController.findAll()).thenReturn(Arrays.asList(film1, film2, film3));
+        Mockito.when(filmController.findAllFilms()).thenReturn(Arrays.asList(film1, film2, film3));
         mockMvc.perform(
                         get("/films")
                 )

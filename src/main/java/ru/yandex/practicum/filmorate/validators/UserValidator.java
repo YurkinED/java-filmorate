@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.validators;
 
-import ru.yandex.practicum.filmorate.exceptions.filmExceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidBirthDateException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidEmailException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginException;
@@ -21,8 +21,8 @@ public class UserValidator {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new InvalidBirthDateException("Дата рождения не может быть в будущем.");
         }
-        if (user.getId() <= 0) {
+       /* if (user.getId() <= 0) {
             throw new InvalidIdException("У пользователя должен быть целочисленный идентификатор.");
-        }
+        }*/
     }
 }

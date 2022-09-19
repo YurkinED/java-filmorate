@@ -140,7 +140,7 @@ public class UserControllerTest {
                 RandomString.make(10), BIRTHDAY);
         User user3 = new User(3, "solntmore@yandex.ru", RandomString.make(10),
                 RandomString.make(10), BIRTHDAY);
-        Mockito.when(userController.findAll()).thenReturn(Arrays.asList(user1, user2, user3));
+        Mockito.when(userController.findAllUsers()).thenReturn(Arrays.asList(user1, user2, user3));
         mockMvc.perform(
                         get("/users")
                 )
