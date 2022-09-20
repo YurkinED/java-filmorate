@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,11 +30,17 @@ public class ErrorHandler {
 
     @ExceptionHandler({InvalidNameException.class, LongDescriptionException.class, NegativeDurationException.class,
             ReleaseDateException.class, InvalidBirthDateException.class, InvalidEmailException.class,
-            InvalidLoginException.class, UserAlreadyExistException.class})
+            InvalidLoginException.class, UserAlreadyExistException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateParameterException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+   /* @ExceptionHandler({InvalidNameException.class, LongDescriptionException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidateParameterException(final RuntimeException e) {
+        return new ErrorResponse(e.getMessage());
+    }*/
 
     @ExceptionHandler({LikesException.class, InvalidIdException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
