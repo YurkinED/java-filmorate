@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
-import ru.yandex.practicum.filmorate.helpTools.FilmIdCounter;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +14,13 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
-    private final FilmValidator filmValidator = new FilmValidator();
-    private final FilmIdCounter idCounter = new FilmIdCounter();
+    @Autowired
+    private final FilmValidator filmValidator;
+    private int id;
+
+    public InMemoryFilmStorage(FilmValidator filmValidator) {
+        this.filmValidator = filmValidator;
+    }
 
     public Collection<Film> findAllFilms() {
         log.debug("Получен запрос GET /films. Текущее количество фильмов: {}", films.size());
@@ -29,14 +34,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film createFilm(@Valid Film film) {
         log.debug("Получен запрос POST /films.");
         filmValidator.validator(film);
-        film.setId(idCounter.incrementIdCounter());
+        film.setId(incrementIdCounter());
         int id = film.getId();
         if (!films.containsKey(id)) {
             films.put(id, film);
             return film;
         } else {
-            idCounter.decrementIdCounter();
-            throw new InvalidIdException("Не удалось создать фильм. Фильм с id: " + id + " уже существует." );
+            decrementIdCounter();
+            throw new InvalidIdException("Не удалось создать фильм. Фильм с id: " + id + " уже существует.");
         }
     }
 
@@ -55,4 +60,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void updateFilmsMap(int id, Film film) {
         films.put(id, film);
     }
+    private int incrementIdCounter() {
+        return ++id;
+    }
+    private int decrementIdCounter() {
+        return --id;
+    }
 }
+

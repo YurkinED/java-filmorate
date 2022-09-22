@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
@@ -9,7 +10,9 @@ import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FilmService {
     private final InMemoryFilmStorage inMemoryFilmStorage;
@@ -52,15 +55,25 @@ public class FilmService {
         }
     }
 
-    public ArrayList<Film> showMostLikedFilms(int count) {
-        Film[] film = inMemoryFilmStorage.findAllFilms().toArray(new Film[0]);
-        ArrayList<Film> films = new ArrayList<>();
-        films.addAll(List.of(film));
-        films.sort(Comparator.comparingInt(Film::showQuantityOfLikes));
-        Collections.reverse(films);
-        int k = films.size();
-        if (k > count)
-            films.subList(count, k).clear();
-        return films;
+    public List<Film> showMostLikedFilms(int count) {
+        return inMemoryFilmStorage.findAllFilms()
+                .stream().sorted(Comparator.comparingLong(Film::showQuantityOfLikes).reversed())
+                .limit(count).collect(Collectors.toList());
+    }
+
+    public Collection<Film> findAllFilms() {
+        return inMemoryFilmStorage.findAllFilms();
+    }
+
+    public Optional<Film> findFilmById(int filmId) {
+        return inMemoryFilmStorage.findFilmById(filmId);
+    }
+
+    public Film createFilm(Film film) {
+        return inMemoryFilmStorage.createFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return inMemoryFilmStorage.updateFilm(film);
     }
 }

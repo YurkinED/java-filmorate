@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.helpTools.UserIdCounter;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -18,8 +18,13 @@ import java.util.Optional;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
-    private final UserValidator userValidator = new UserValidator();
-    private final UserIdCounter idCounter = new UserIdCounter();
+    @Autowired
+    private final UserValidator userValidator;
+    private int id;
+
+    public InMemoryUserStorage(UserValidator userValidator) {
+        this.userValidator = userValidator;
+    }
 
     public Collection<User> findAllUsers() {
         log.debug("Получен запрос GET /users. Текущее количество пользователей: {}", users.size());
@@ -33,11 +38,11 @@ public class InMemoryUserStorage implements UserStorage {
     public User createUser(@Valid User user) {
         log.debug("Получен запрос POST /users.");
         userValidator.validator(user);
-        user.setId(idCounter.incrementIdCounter());
+        user.setId(incrementIdCounter());
         int id = user.getId();
         String name = user.getName();
         if (users.containsKey(id)) {
-            idCounter.decrementIdCounter();
+            decrementIdCounter();
             throw new UserAlreadyExistException("Пользователь с электронной почтой " +
                     id + " уже зарегистрирован.");
         }
@@ -62,5 +67,12 @@ public class InMemoryUserStorage implements UserStorage {
         } else {
             throw new InvalidIdException("Не удалось обновить пользователя. Нет пользователя с id: " + id);
         }
+    }
+
+    private int incrementIdCounter() {
+        return ++id;
+    }
+    private int decrementIdCounter() {
+        return --id;
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.validators;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.InvalidNameException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LongDescriptionException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.NegativeDurationException;
@@ -8,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
+@Component
 public class FilmValidator {
     private final static LocalDate BENCHMARK_FOR_FILM_DATE = LocalDate.of(1895, 12, 28);
 

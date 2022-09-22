@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,71 +23,71 @@ public class UserService {
     }
 
     public void addToFriends(int userId, int friendId) {
-        if (inMemoryUserStorage.findUserById(userId).isPresent()
-                && inMemoryUserStorage.findUserById(friendId).isPresent()) {
-            if (inMemoryUserStorage.findUserById(userId).get().addFriendToSet(friendId)
-                    && inMemoryUserStorage.findUserById(friendId).get().addFriendToSet(userId)) {
-                log.debug("Пользователь {} и {} стали друзьями");
+        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
+        Optional<User> optionalFriend = inMemoryUserStorage.findUserById(friendId);
+        if (optionalUser.isPresent()
+                && optionalFriend.isPresent()) {
+            if (optionalUser.get().addFriendToSet(friendId)
+                    && optionalFriend.get().addFriendToSet(userId)) {
+                log.warn("Пользователь {} и {} стали друзьями");
             } else {
-                log.debug("Пользователь {} и {} уже друзья");
+                log.warn("Пользователь {} и {} уже друзья");
                 throw new InvalidIdException("Пользователи уже являются друзьями, попробуйте другой id.");
             }
         } else {
-            log.debug("Неверно введен id {}.");
+            log.warn("Неверно введен id {}.");
             throw new InvalidIdException("Неверно введен id пользователя или друга.");
         }
     }
 
     public void removeFromFriends(int userId, int friendId) {
-        if (inMemoryUserStorage.findUserById(userId).isPresent()
-                && inMemoryUserStorage.findUserById(friendId).isPresent()) {
-            if (inMemoryUserStorage.findUserById(userId).get().deleteFriendToSet(friendId)
-                    && inMemoryUserStorage.findUserById(friendId).get().deleteFriendToSet(userId)) {
-                log.debug("Пользователь {} и {} перестали быть друзьями");
+        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
+        Optional<User> optionalFriend = inMemoryUserStorage.findUserById(friendId);
+        if (optionalUser.isPresent()
+                && optionalFriend.isPresent()) {
+            if (optionalUser.get().deleteFriendToSet(friendId)
+                    && optionalFriend .get().deleteFriendToSet(userId)) {
+                log.warn("Пользователь {} и {} перестали быть друзьями");
             } else {
-                log.debug("Пользователь {} и {} не друзья");
+                log.warn("Пользователь {} и {} не друзья");
                 throw new InvalidIdException("Пользователи не являются друзьями, попробуйте другой id.");
             }
         } else {
-            log.debug("Неверно введен id {}.");
+            log.warn("Неверно введен id {}.");
             throw new InvalidIdException("Неверно введен id пользователя или друга.");
         }
     }
 
-    public ArrayList<User> showCommonFriends(int userId, int friendId) {
-        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
-        Optional<User> optionalFriend = inMemoryUserStorage.findUserById(friendId);
-        ArrayList<User> commonFriends = new ArrayList<>();
-
-        if (optionalUser.isPresent() && optionalFriend.isPresent()) {
-            User user = optionalUser.get();
-            User friend = optionalFriend.get();
-            ArrayList<Integer> userFriendsSet = user.getFriends();
-            ArrayList<Integer> commonFriendsSet = new ArrayList<>();
-            commonFriendsSet.addAll(userFriendsSet);
-            ArrayList<Integer> friendFriendsSet = friend.getFriends();
-            commonFriendsSet.removeIf(element -> !friendFriendsSet.contains(element));
-            for (Integer integer : commonFriendsSet) {
-                commonFriends.add(inMemoryUserStorage.findUserById(integer).get());
-            }
-            return commonFriends;
-        } else {
-            throw new InvalidIdException("Неверно введен id пользователя или друга.");
+    public List<User> showCommonFriends(int userId, int friendId) {
+            return inMemoryUserStorage.findUserById(userId)
+                    .orElseThrow(() -> new InvalidIdException("Нет пользователя с таким id")).getFriends().stream()
+                    .filter(id -> inMemoryUserStorage.findUserById(friendId)
+                            .orElseThrow(() -> new InvalidIdException("Нет друга с таким id"))
+                            .getFriends().contains(id))
+                    .map(commonId -> inMemoryUserStorage.findUserById(commonId).orElse(null))
+                    .collect(Collectors.toList());
         }
+
+    public List<User> showUserFriends(int userId) {
+        return inMemoryUserStorage.findUserById(userId)
+                .orElseThrow(() -> new InvalidIdException("Нет пользователя с таким id")).getFriends().stream()
+                .map(commonId -> inMemoryUserStorage.findUserById(commonId).orElse(null))
+                .collect(Collectors.toList());
     }
 
-    public ArrayList<User> showUserFriends(int userId) {
-        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
+    public Collection<User> findAllUsers() {
+        return inMemoryUserStorage.findAllUsers();
+    }
 
-        if (optionalUser.isPresent()) {
-            ArrayList<User> friends = new ArrayList<>();
-            User user = optionalUser.get();
-            ArrayList<Integer> friendsIdSet = user.getFriends();
-            for (int id : friendsIdSet) {
-                friends.add(inMemoryUserStorage.findUserById(id).get());
-            }
-            return friends;
-        }
-        throw new InvalidIdException("Неверно введен id пользователя.");
+    public Optional<User> findUserById(int userId) {
+        return inMemoryUserStorage.findUserById(userId);
+    }
+
+    public User createUser(User user) {
+        return inMemoryUserStorage.createUser(user);
+    }
+
+    public User updateUser(@Valid User user) {
+        return inMemoryUserStorage.updateUser(user);
     }
 }
