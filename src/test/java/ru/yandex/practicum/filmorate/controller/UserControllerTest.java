@@ -5,12 +5,16 @@ import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidBirthDateException;
+import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidEmailException;
+import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -22,7 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -56,7 +61,7 @@ public class UserControllerTest {
 
     @Test
     void tryToCreateUserWithInvalidEmailBadRequest() throws Exception {
-        User user = new User(1, "левыйЕмаил@", "login", "name", BIRTHDAY);
+        User user = new User(1, "левыйЕмаил", "login", "name", BIRTHDAY);
 
         this.mockMvc.perform(
                         post("/users")
@@ -65,7 +70,7 @@ public class UserControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
-                        assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+                        assertTrue(result.getResolvedException() instanceof InvalidEmailException));
     }
 
     @Test
@@ -79,7 +84,7 @@ public class UserControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
-                        assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+                        assertTrue(result.getResolvedException() instanceof InvalidLoginException));
     }
 
     @Test
@@ -140,7 +145,7 @@ public class UserControllerTest {
                 RandomString.make(10), BIRTHDAY);
         User user3 = new User(3, "solntmore@yandex.ru", RandomString.make(10),
                 RandomString.make(10), BIRTHDAY);
-        Mockito.when(userController.findAll()).thenReturn(Arrays.asList(user1, user2, user3));
+        Mockito.when(userController.findAllUsers()).thenReturn(Arrays.asList(user1, user2, user3));
         mockMvc.perform(
                         get("/users")
                 )
