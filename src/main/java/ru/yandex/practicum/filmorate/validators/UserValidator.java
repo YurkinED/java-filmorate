@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginExcep
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+
 @Component
 public class UserValidator {
     public void validator(User user) {

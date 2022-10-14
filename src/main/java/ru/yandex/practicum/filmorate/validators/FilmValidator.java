@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.exceptions.filmExceptions.InvalidNameExcept
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LongDescriptionException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.NegativeDurationException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.ReleaseDateException;
+import ru.yandex.practicum.filmorate.model.BaseEntity;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class FilmValidator {
 
     public void validator(Film film) {
         String name = film.getName();
+        BaseEntity mpa = film.getMpa();
         if (name == null || name.isBlank()) {
             throw new InvalidNameException("Нужно заполнить название фильма.");
         }
@@ -26,6 +28,9 @@ public class FilmValidator {
         }
         if (film.getDuration() <= 0) {
             throw new NegativeDurationException("Продолжительность фильма должна быть положительной.");
+        }
+        if (mpa == null) {
+            throw new RuntimeException("Необходимо добавить MPA.");
         }
     }
 }

@@ -5,89 +5,83 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.validators.UserValidator;
 
-import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserService {
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final UserDbStorage userDbStorage;
+    private final UserValidator userValidator;
 
 
     @Autowired
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserService(UserDbStorage userDbStorage, UserValidator userValidator) {
+        this.userDbStorage = userDbStorage;
+        this.userValidator = userValidator;
     }
 
     public void addToFriends(int userId, int friendId) {
-        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
-        Optional<User> optionalFriend = inMemoryUserStorage.findUserById(friendId);
+        Optional<User> optionalUser = userDbStorage.findUserById(userId);
+        Optional<User> optionalFriend = userDbStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (optionalUser.get().addFriendToSet(friendId)
-                    && optionalFriend.get().addFriendToSet(userId)) {
-                log.warn("Пользователь {} и {} стали друзьями");
+            if (!userDbStorage.checkFriendshipExists(userId, friendId)) {
+                userDbStorage.addToFriend(userId, friendId);
+                log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
             } else {
-                log.warn("Пользователь {} и {} уже друзья");
+                log.warn("Пользователь {} и {} уже друзья", userId, friendId);
                 throw new InvalidIdException("Пользователи уже являются друзьями, попробуйте другой id.");
             }
         } else {
-            log.warn("Неверно введен id {}.");
+            log.warn("Неверно введен id {} или {}.", userId, friendId);
             throw new InvalidIdException("Неверно введен id пользователя или друга.");
         }
     }
 
     public void removeFromFriends(int userId, int friendId) {
-        Optional<User> optionalUser = inMemoryUserStorage.findUserById(userId);
-        Optional<User> optionalFriend = inMemoryUserStorage.findUserById(friendId);
+        Optional<User> optionalUser = userDbStorage.findUserById(userId);
+        Optional<User> optionalFriend = userDbStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (optionalUser.get().deleteFriendToSet(friendId)
-                    && optionalFriend .get().deleteFriendToSet(userId)) {
-                log.warn("Пользователь {} и {} перестали быть друзьями");
+            if (userDbStorage.checkFriendshipExists(userId, friendId)) {
+                userDbStorage.removeFromFriends(userId, friendId);
+                log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
             } else {
-                log.warn("Пользователь {} и {} не друзья");
+                log.warn("Пользователь {} и {} не друзья ", userId, friendId);
                 throw new InvalidIdException("Пользователи не являются друзьями, попробуйте другой id.");
             }
         } else {
-            log.warn("Неверно введен id {}.");
+            log.warn("Неверно введен id {} или {}.", userId, friendId);
             throw new InvalidIdException("Неверно введен id пользователя или друга.");
         }
     }
 
-    public List<User> showCommonFriends(int userId, int friendId) {
-            return inMemoryUserStorage.findUserById(userId)
-                    .orElseThrow(() -> new InvalidIdException("Нет пользователя с таким id")).getFriends().stream()
-                    .filter(id -> inMemoryUserStorage.findUserById(friendId)
-                            .orElseThrow(() -> new InvalidIdException("Нет друга с таким id"))
-                            .getFriends().contains(id))
-                    .map(commonId -> inMemoryUserStorage.findUserById(commonId).orElse(null))
-                    .collect(Collectors.toList());
-        }
+    public Collection<User> showCommonFriends(int userId, int friendId) {
+        return userDbStorage.showCommonFriends(userId, friendId);
+    }
 
-    public List<User> showUserFriends(int userId) {
-        return inMemoryUserStorage.findUserById(userId)
-                .orElseThrow(() -> new InvalidIdException("Нет пользователя с таким id")).getFriends().stream()
-                .map(commonId -> inMemoryUserStorage.findUserById(commonId).orElse(null))
-                .collect(Collectors.toList());
+    public Collection<User> showUserFriends(int userId) {
+        return userDbStorage.showUserFriendsId(userId);
     }
 
     public Collection<User> findAllUsers() {
-        return inMemoryUserStorage.findAllUsers();
+        return userDbStorage.findAllUsers();
     }
 
     public Optional<User> findUserById(int userId) {
-        return inMemoryUserStorage.findUserById(userId);
+        return userDbStorage.findUserById(userId);
     }
 
     public User createUser(User user) {
-        return inMemoryUserStorage.createUser(user);
+        userValidator.validator(user);
+        return userDbStorage.createUser(user);
     }
 
-    public User updateUser(@Valid User user) {
-        return inMemoryUserStorage.updateUser(user);
+    public User updateUser(User user) {
+        userValidator.validator(user);
+        return userDbStorage.updateUser(user);
     }
 }

@@ -12,5 +12,4 @@ public interface FilmStorage {
 
     Film updateFilm(@Valid Film film);
 
-    void updateFilmsMap(int id, Film film);
 }
