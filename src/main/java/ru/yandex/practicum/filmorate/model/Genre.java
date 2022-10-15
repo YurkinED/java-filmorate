@@ -8,7 +8,7 @@ import lombok.Value;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Genre extends BaseEntity {
-    String name;
+    private String name;
 
     public Genre(int id, String name) {
         super(id);

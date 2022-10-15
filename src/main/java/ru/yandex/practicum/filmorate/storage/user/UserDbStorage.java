@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.platform.commons.util.StringUtils.isBlank;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*;
 
 @Slf4j
@@ -39,10 +41,10 @@ public class UserDbStorage implements UserStorage {
 
     public User createUser(User user) {
         String name = user.getName();
-        if (name == null || name.isBlank()) {
+
+        if (isBlank(name)) {
             user.setName(user.getLogin());
         }
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource parameters = getUserParameters(user);
 
@@ -58,7 +60,7 @@ public class UserDbStorage implements UserStorage {
 
         if (checkUserExists(userId)) {
             String name = user.getName();
-            if (name == null || name.isBlank()) {
+            if (isBlank(name)) {
                 user.setName(user.getLogin());
             }
 

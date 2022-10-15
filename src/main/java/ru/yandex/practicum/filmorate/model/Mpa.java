@@ -8,7 +8,7 @@ import lombok.Value;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Mpa extends BaseEntity {
-    String name;
+    private String name;
 
     public Mpa(int id, String name) {
         super(id);

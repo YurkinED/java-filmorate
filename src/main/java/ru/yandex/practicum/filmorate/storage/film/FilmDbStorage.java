@@ -54,42 +54,6 @@ public class FilmDbStorage implements FilmStorage {
         return installFilmGenres(film);
     }
 
-    public Collection<Genre> findAllGenres() {
-        return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> makeGenre(rs));
-    }
-
-    public Optional<Genre> findGenreById(int genreId) {
-        SqlRowSet genreRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_GENRE_BY_ID, genreId);
-        if (genreRows.next()) {
-            Genre genre = new Genre(
-                    genreRows.getInt("genre_id"),
-                    genreRows.getString("genre_name"));
-            return Optional.of(genre);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-
-    public Collection<Mpa> findAllMpa() {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_MPA, (rs, rowNum) -> makeMpa(rs));
-    }
-
-    public Optional<Mpa> findMpaById(int mpaId) {
-        SqlRowSet mpaRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_MPA_BY_ID, mpaId);
-        if (mpaRows.next()) {
-            Mpa mpa = new Mpa(
-                    mpaRows.getInt("mpa_id_in_mpa"),
-                    mpaRows.getString("mpa_name"));
-            return Optional.of(mpa);
-        } else {
-            return Optional.empty();
-        }
-    }
-
     public Optional<Film> findFilmById(int filmId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_AND_MPA_BY_ID, filmId);
@@ -165,18 +129,6 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
         return film;
-    }
-
-    private Genre makeGenre(ResultSet rs) throws SQLException {
-        int id = rs.getInt("genre_id");
-        String name = rs.getString("genre_name");
-        return new Genre(id, name);
-    }
-
-    private Mpa makeMpa(ResultSet rs) throws SQLException {
-        int id = rs.getInt("mpa_id_in_mpa");
-        String name = rs.getString("mpa_name");
-        return new Mpa(id, name);
     }
 
     private Film installFilmGenres(Film film) {
