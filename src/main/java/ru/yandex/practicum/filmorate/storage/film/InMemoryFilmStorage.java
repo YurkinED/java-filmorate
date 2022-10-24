@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -22,6 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         this.filmValidator = filmValidator;
     }
 
+    @Override
     public Collection<Film> findAllFilms() {
         log.debug("Получен запрос GET /films. Текущее количество фильмов: {}", films.size());
         return films.values();
@@ -31,6 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.ofNullable(films.get(filmId));
     }
 
+    @Override
     public Film createFilm(@Valid Film film) {
         log.debug("Получен запрос POST /films.");
         filmValidator.validator(film);
@@ -45,6 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
+    @Override
     public Film updateFilm(@Valid Film film) {
         log.debug("Получен запрос PUT /films.");
         filmValidator.validator(film);
@@ -60,9 +64,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void updateFilmsMap(int id, Film film) {
         films.put(id, film);
     }
+
     private int incrementIdCounter() {
         return ++id;
     }
+
     private int decrementIdCounter() {
         return --id;
     }
