@@ -38,4 +38,12 @@ public class SqlQueryConstantsForFilm {
     public static final String SQL_QUERY_COUNT_LIKES = "SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = ?";
 
     public static final String SQL_QUERY_DELETE_FILMS_GENRE = "DELETE FROM films_genres WHERE film_id = ?";
+    public static final String SQL_QUERY_TAKE_COMMON_FILMS =  "SELECT f.*, m.mpa_name FROM films AS f " +
+            " LEFT JOIN mpa AS m ON f.mpa_id_in_film = m.mpa_id_in_mpa "+
+            " where f.film_id in " +
+            "(" +
+            "select t1.film_id from " +
+            "(select film_id from likes where user_id=?) as t1 " +
+            "join (select film_id from likes where user_id=?) as t2 on t1.film_id=t2.film_id " +
+            ")";
 }

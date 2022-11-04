@@ -63,6 +63,8 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
+
+
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
@@ -81,5 +83,9 @@ public class FilmService {
         filmValidator.validator(film);
         log.info("Валидация в сервисе прошла успешно, объект {}", film);
         return filmStorage.updateFilm(film);
+    }
+
+    public List<Film> showCommonLikedFilms(int userId, int friendId){
+        return filmStorage.commonLikedFilms(userId, friendId);
     }
 }

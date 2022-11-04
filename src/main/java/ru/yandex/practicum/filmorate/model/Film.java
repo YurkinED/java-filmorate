@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +33,7 @@ public class Film {
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, long duration, BaseEntity mpa) {
+   public Film(int id, String name, String description, LocalDate releaseDate, long duration, BaseEntity mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
