@@ -20,5 +20,7 @@ public class SqlQueryConstantsForUser {
     public static final String SQL_QUERY_REMOVE_FROM_FRIENDS = "DELETE FROM friends WHERE first_user_id = :first_user_id " +
             "AND second_user_id = :second_user_id";
 
+    public static final String SQL_QUERY_REMOVE_DIRECTOR = "DELETE FROM directors WHERE director_id = :director_id";
+
 
 }

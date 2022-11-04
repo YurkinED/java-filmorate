@@ -29,6 +29,8 @@ public class Film {
 
     private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
 
+    private Set<BaseEntity> directors = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
+
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;
 
@@ -69,5 +71,9 @@ public class Film {
         log.info("Метод addGenresToFilm в фильме запущен {}", genre);
         genres.add(genre);
         log.info("Жанры добавлены в фильм {}", genre);
+    }
+
+    public int getYear() {
+        return releaseDate.getYear();
     }
 }

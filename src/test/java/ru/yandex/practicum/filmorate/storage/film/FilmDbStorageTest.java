@@ -8,11 +8,13 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -24,11 +26,13 @@ public class FilmDbStorageTest {
     private final static BaseEntity MPA = new BaseEntity(1);
     private final FilmDbStorage filmStorage;
 
+    private final FilmService filmService;
+
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllFilms() {
         Collection<Film> films = filmStorage.findAllFilms();
-        assertThat(films.size() == 5);
+        assertTrue(films.size() == 5);
     }
 
     @Test
@@ -78,22 +82,48 @@ public class FilmDbStorageTest {
         boolean trueFlag = filmStorage.checkLikeFilm(1, 2);
         boolean falseFlag = filmStorage.checkLikeFilm(1, 4);
 
-        assertThat(trueFlag == true);
-        assertThat(falseFlag == false);
+        assertTrue(trueFlag == true);
+        assertTrue(falseFlag == false);
     }
 
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testLikeFilmOrRemoveLike() {
         boolean flag = filmStorage.checkLikeFilm(1, 4);
-        assertThat(flag == false);
+        assertTrue(flag == false);
 
         filmStorage.likeFilmOrRemoveLike(1, 4, true);
         flag = filmStorage.checkLikeFilm(1, 4);
-        assertThat(flag == true);
+        assertTrue(flag == true);
 
         filmStorage.likeFilmOrRemoveLike(1, 4, false);
         flag = filmStorage.checkLikeFilm(1, 4);
-        assertThat(flag == false);
+        assertTrue(flag == false);
     }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testShowDirectorsFilmsSortLikes() {
+        List<Film> filmsFirstDirector = filmService.showDirectorsFilmsSortLikes(1);
+        List<Film> filmsSecondDirector = filmService.showDirectorsFilmsSortLikes(2);
+        assertTrue(filmsFirstDirector.size() == 3);
+        assertTrue(filmsSecondDirector.size() == 2);
+
+        Film film = filmsFirstDirector.get(0);
+        assertTrue(film.getId() == 1);
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testShowDirectorsFilmsSortYears() {
+        List<Film> filmsFirstDirector = filmService.showDirectorsFilmsSortYear(1);
+        List<Film> filmsSecondDirector = filmService.showDirectorsFilmsSortYear(2);
+        assertTrue(filmsFirstDirector.size() == 3);
+        assertTrue(filmsSecondDirector.size() == 2);
+
+        Film film = filmsFirstDirector.get(0);
+        assertTrue(film.getYear() == 2022);
+    }
+
+
 }
