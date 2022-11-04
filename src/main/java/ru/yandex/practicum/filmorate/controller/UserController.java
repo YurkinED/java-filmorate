@@ -74,4 +74,11 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
     }
 
+    @DeleteMapping("/{userId}")
+    public User deleteUserById(@PathVariable int userId) {
+        log.debug("Получен запрос Delete /users/{}. Удалить пользователя по userId {}.", userId, userId);
+        return userService.deleteUserById(userId).orElseThrow(
+                () -> new InvalidIdException("К сожалению, пользователя с id " + userId + " нет."));
+    }
+
 }
