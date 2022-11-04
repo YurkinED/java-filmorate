@@ -60,7 +60,7 @@ jobs:
 
       - name: Run POSTMAN tests
         run: >
-          newman run ./tests/postman/sprint.json 
+          newman run ./tests/postman/sprint12.json 
           --delay-request 50
           --verbose --color on --reporter-htmlextra-darkTheme 
           --reporter-htmlextra-export reports/shareIt.html
