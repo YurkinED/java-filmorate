@@ -42,30 +42,6 @@ public class Film {
         this.mpa = mpa;
     }
 
-    /*
-        public boolean addLike(int userId) {
-            if (!likes.contains(userId)) {
-                likes.add(userId);
-                log.debug("Пользователь {} поставил лайк");
-                return true;
-            }
-            return false;
-        }
-
-        public boolean removeLike(int userId) {
-            if (likes.contains(userId)) {
-                likes.remove(userId);
-                log.debug("Пользователь {} удалил лайк");
-                return true;
-            }
-            return false;
-        }
-
-
-        public int showQuantityOfLikes() {
-            return likes.size();
-        }
-    */
     public void addGenresToFilm(Genre genre) {
         log.info("Метод addGenresToFilm в фильме запущен {}", genre);
         genres.add(genre);
