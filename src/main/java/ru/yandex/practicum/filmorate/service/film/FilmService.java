@@ -87,5 +87,9 @@ public class FilmService {
 
     public List<Film> showCommonLikedFilms(int userId, int friendId){
         return filmStorage.commonLikedFilms(userId, friendId);
+
+    public void deleteFilmById(int filmId) {
+        filmStorage.deleteFilmById(filmId);
+
     }
 }

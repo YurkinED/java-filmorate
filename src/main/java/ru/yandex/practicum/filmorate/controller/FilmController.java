@@ -79,6 +79,13 @@ public class FilmController {
         filmService.removeLikeFromFilm(filmId, userId);
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilmById(@PathVariable int filmId) {
+        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId " + filmId);
+        filmService.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
+        filmService.deleteFilmById(filmId);
+    }
 
 
 }

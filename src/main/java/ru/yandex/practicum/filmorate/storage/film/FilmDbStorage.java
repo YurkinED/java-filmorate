@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
 
 @Slf4j
 @Component
@@ -166,6 +167,7 @@ public class FilmDbStorage implements FilmStorage {
         return parameters;
     }
 
+
     public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
@@ -184,5 +186,9 @@ public class FilmDbStorage implements FilmStorage {
             returnList.add(film);
         }
         return returnList;
+
+    public void deleteFilmById(int filmId) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
+
     }
 }
