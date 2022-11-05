@@ -73,6 +73,12 @@ public class Film {
         log.info("Жанры добавлены в фильм {}", genre);
     }
 
+    public void addDirectorToFilm(Director director) {
+        log.info("Метод addDirectorToFilm в фильме запущен {}", director);
+        directors.add(director);
+        log.info("Режиссеры добавлены в фильм {}", director);
+    }
+
     public int getYear() {
         return releaseDate.getYear();
     }

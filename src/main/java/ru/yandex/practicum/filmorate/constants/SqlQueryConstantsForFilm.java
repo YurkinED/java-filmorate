@@ -5,6 +5,15 @@ public class SqlQueryConstantsForFilm {
             "LEFT JOIN films_genres fg on f.film_id = fg.film_id LEFT JOIN genres g on fg.genre_id = g.genre_id " +
             "WHERE f.film_id = ?";
 
+    public static final String SQL_QUERY_TAKE_FILMS_DIRECTOR_BY_ID = "SELECT d.director_id, d.director_name " +
+            "FROM films AS f LEFT JOIN films_directors dg on f.film_id = dg.film_id LEFT JOIN directors d " +
+            "on dg.director_id = d.director_id WHERE d.director_id = ?";
+
+    public static final String SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID = "SELECT g.genre_id, g.genre_name, " +
+            "d.director_id, d.director_name FROM films AS f LEFT JOIN films_genres fg on f.film_id = fg.film_id " +
+            "LEFT JOIN genres g on fg.genre_id = g.genre_id LEFT JOIN films_directors fd on f.film_id = fd.film_id " +
+            "LEFT JOIN directors d on d.director_id = fd.director_id WHERE f.film_id = ?";
+
     public static final String SQL_QUERY_CREATE_FILM = "INSERT INTO films (film_name, description, release_date," +
             " duration, mpa_id_in_film) VALUES (:film_name, :description, :release_date, :duration, :mpa_id_in_film)";
     public static final String SQL_QUERY_CREATE_DIRECTOR = "INSERT INTO directors (director_name) " +

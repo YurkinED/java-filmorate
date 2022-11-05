@@ -88,7 +88,7 @@ public class FilmService {
 
     public List<Film> showDirectorsFilmsSortYear(int directorId) {
         return filmStorage.findFilmsByDirectorId(directorId)
-                .stream().sorted(Comparator.comparingLong(Film::getYear).reversed())
+                .stream().sorted(Comparator.comparingLong(Film::getYear))
                 .collect(Collectors.toList());
     }
 }

@@ -48,17 +48,17 @@ public class FilmController {
         }
     }
 
-    @GetMapping("/director/{directorId}?sortBy")
-    public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam String parameter) {
-        if (parameter.equals("year")) {
+    @GetMapping("director/{directorId}")
+    public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam(name = "sortBy") String sortBy) {
+        if (sortBy.equals("year")) {
             log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} по годам.",
                     directorId, directorId);
-            return filmService.showDirectorsFilmsSortLikes(directorId);
-        } else {
+            return filmService.showDirectorsFilmsSortYear(directorId);
+       } else {
             log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} " +
                     "по популярности.", directorId, directorId);
-            return filmService.showDirectorsFilmsSortYear(directorId);
-        }
+            return filmService.showDirectorsFilmsSortLikes(directorId);
+       }
     }
 
     @PostMapping

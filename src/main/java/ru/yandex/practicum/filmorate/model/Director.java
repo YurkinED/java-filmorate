@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.Value;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Value
@@ -12,7 +13,7 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode(callSuper = true)
 public class Director extends BaseEntity {
 
-    @Size(min = 1, max = 200)
+    @NotBlank
     private String name;
 
     public Director(int id, String name) {
