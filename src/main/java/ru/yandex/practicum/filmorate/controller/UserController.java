@@ -38,6 +38,8 @@ public class UserController {
     @GetMapping("/{userId}/friends")
     public Collection<User> getFriendsByUserId(@PathVariable int userId) {
         log.debug("Получен запрос Get /users/{}/friends. Найти друзей пользователя по userId {}.", userId, userId);
+        userService.findUserById(userId).orElseThrow(
+                () -> new InvalidIdException("К сожалению, пользователя с id " + userId + " нет."));
         return userService.showUserFriends(userId);
     }
 
@@ -75,10 +77,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public User deleteUserById(@PathVariable int userId) {
+    public void deleteUserById(@PathVariable int userId) {
         log.debug("Получен запрос Delete /users/{}. Удалить пользователя по userId {}.", userId, userId);
-        return userService.deleteUserById(userId).orElseThrow(
+        userService.findUserById(userId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, пользователя с id " + userId + " нет."));
+        userService.deleteUserById(userId);
     }
 
 }

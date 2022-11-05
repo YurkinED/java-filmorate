@@ -28,10 +28,14 @@ CREATE TABLE genres
     genre_name varchar(40)
 );
 
-CREATE TABLE films_genres
+create table FILMS_GENRES
 (
-    film_id int REFERENCES films(film_id),
-    genre_id int REFERENCES genres(genre_id)
+    FILM_ID  INTEGER
+        references FILMS
+            on delete cascade,
+    GENRE_ID INTEGER
+        references GENRES
+            on delete cascade
 );
 
 
@@ -45,17 +49,27 @@ CREATE TABLE users
     birthday DATE
 );
 
-CREATE TABLE likes
+create table LIKES
 (
-    film_id int REFERENCES films(film_id),
-    user_id int REFERENCES users(user_id)
+    FILM_ID INTEGER
+        references FILMS
+            on delete cascade,
+    USER_ID INTEGER
+        references USERS
+            on delete cascade
 );
 
-CREATE TABLE friends
+
+create table FRIENDS
 (
-    first_user_id int REFERENCES users(user_id),
-    second_user_id int REFERENCES users(user_id)
+    FIRST_USER_ID  INTEGER
+        references USERS
+            on delete cascade,
+    SECOND_USER_ID INTEGER
+        references USERS
+            on delete cascade
 );
+
 
 
 

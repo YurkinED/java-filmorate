@@ -84,4 +84,8 @@ public class UserService {
         userValidator.validator(user);
         return userDbStorage.updateUser(user);
     }
+
+    public void deleteUserById(int userId) {
+        userDbStorage.delete(userId);
+    }
 }
