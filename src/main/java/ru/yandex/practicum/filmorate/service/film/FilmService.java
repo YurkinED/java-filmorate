@@ -55,8 +55,7 @@ public class FilmService {
     }
 
     public List<Film> showMostLikedFilms(int count) {
-        return filmStorage.findAllFilms()
-                .stream().sorted(Comparator.comparingLong(Film::getRating).reversed())
+        return filmStorage.findAllFilms().stream()
                 .limit(count).collect(Collectors.toList());
     }
 
@@ -80,15 +79,7 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public List<Film> showDirectorsFilmsSortLikes(int directorId) {
-        return filmStorage.findFilmsByDirectorId(directorId)
-                .stream().sorted(Comparator.comparingLong(Film::getRating).reversed())
-                .collect(Collectors.toList());
-    }
-
-    public List<Film> showDirectorsFilmsSortYear(int directorId) {
-        return filmStorage.findFilmsByDirectorId(directorId)
-                .stream().sorted(Comparator.comparingLong(Film::getYear))
-                .collect(Collectors.toList());
+    public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
+        return filmStorage.findFilmsByDirectorAndSort(directorId, query);
     }
 }

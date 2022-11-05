@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.director;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,6 +22,7 @@ public class DirectorDbStorageTest {
     private final DirectorDbStorage directorDbStorage;
 
     @Test
+    @DisplayName("Тест на поиск всех режиссеров")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllDirectors() {
         Collection<Director> directors = directorDbStorage.findAllDirectors();
@@ -28,6 +30,7 @@ public class DirectorDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск режиссера по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testGetDirectorById() {
         Optional<Director> directorOptional = directorDbStorage.findDirectorById(4);
@@ -43,6 +46,7 @@ public class DirectorDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на создание режиссера")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCreateDirector() {
         Director testDirector = new Director(7, "Кристофер Нолан");
@@ -52,6 +56,7 @@ public class DirectorDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на обновление режиссера")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void updateDirector() {
         Director testDirector = new Director(1, "Кристофер Нолан");
@@ -62,6 +67,7 @@ public class DirectorDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на удаление режиссера")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void deleteDirector() {
         Collection<Director> directors = directorDbStorage.findAllDirectors();

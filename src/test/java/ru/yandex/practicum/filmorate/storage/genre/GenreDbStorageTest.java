@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,6 +22,7 @@ public class GenreDbStorageTest {
     private final GenreDbStorage genreDbStorage;
 
     @Test
+    @DisplayName("Тест на поиск всех жанров")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllGenres() {
         Collection<Genre> genres = genreDbStorage.findAllGenres();
@@ -28,6 +30,7 @@ public class GenreDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск жанра по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindGenreById() {
         Optional<Genre> genreOptional = genreDbStorage.findGenreById(2);

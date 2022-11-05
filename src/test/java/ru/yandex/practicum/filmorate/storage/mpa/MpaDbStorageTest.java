@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,6 +22,7 @@ public class MpaDbStorageTest {
 
     private final MpaDbStorage mpaDbStorage;
     @Test
+    @DisplayName("Тест на поиск всех mpa")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllMpa() {
         Collection<Mpa> mpas = mpaDbStorage.findAllMpa();
@@ -28,6 +30,7 @@ public class MpaDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск mpa по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindMpaById() {
         Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(3);

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -24,6 +25,7 @@ public class UserDbStorageTest {
     private final UserDbStorage userStorage;
 
     @Test
+    @DisplayName("Тест на создание пользователя с корректными данными")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCreateUserWithFullData() {
         User testUser = new User(1, "solntmore@yandex.ru", RandomString.make(10),
@@ -34,6 +36,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на создание пользователя с пустым именем")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCreateUserWithEmptyName() {
         User testUser = new User(1, "solntmore@gmail.com", RandomString.make(10),
@@ -45,6 +48,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск всех пользователей")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllUsers() {
         Collection<User> users = userStorage.findAllUsers();
@@ -53,6 +57,7 @@ public class UserDbStorageTest {
 
 
     @Test
+    @DisplayName("Тест на обновление всех пользователя")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testUpdateUser() {
         User testUser = new User(1, "solntmore@gmail.com", RandomString.make(10),
@@ -65,6 +70,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск пользователя по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindUserById() {
         Optional<User> userOptional = userStorage.findUserById(2);
@@ -80,6 +86,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на проверку наличия пользователя")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCheckUserExists() {
         boolean trueFlag = userStorage.checkUserExists(1);
@@ -90,6 +97,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на проверку наличия дружбы")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCheckFriendshipExists() {
         boolean trueFlag = userStorage.checkFriendshipExists(1, 2);
@@ -100,6 +108,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на добавление в друзья")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testAddToFriend() {
         boolean flag = userStorage.checkFriendshipExists(1, 4);
@@ -111,6 +120,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск друзей по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testShowUserFriendsId() {
         Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
@@ -122,6 +132,7 @@ public class UserDbStorageTest {
     }
 
     @Test
+    @DisplayName("Тест на поиск общих друзей")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testShowCommonFriends() {
         Collection<User> commonFriends1And2 = userStorage.showCommonFriends(1, 2);

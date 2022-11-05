@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.genre.GenreService;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 
 import java.util.Collection;
 

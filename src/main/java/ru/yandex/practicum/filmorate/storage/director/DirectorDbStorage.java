@@ -78,6 +78,7 @@ public class DirectorDbStorage implements DirectorInterface {
         parameters.addValue("director_id", directorId);
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
     }
+
     private Director makeDirector(ResultSet rs) throws SQLException {
         int id = rs.getInt("director_id");
         String name = rs.getString("director_name");

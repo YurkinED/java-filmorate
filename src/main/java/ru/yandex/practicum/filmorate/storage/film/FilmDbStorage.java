@@ -34,7 +34,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findAllFilms() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS,
-                (rs, rowNum) -> makeFilm(rs));
+                (rs, rowNum) -> makeFilmFromRs(rs));
     }
 
     @Override
@@ -60,7 +60,8 @@ public class FilmDbStorage implements FilmStorage {
 
     public Optional<Film> findFilmById(int filmId) {
         SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_AND_MPA_BY_ID, filmId);
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID,
+                        filmId);
         if (filmRows.next()) {
             Film film = new Film(
                     filmRows.getInt("film_id"),
@@ -69,10 +70,11 @@ public class FilmDbStorage implements FilmStorage {
                     Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
                     filmRows.getLong("duration"),
                     new Mpa(
-                            filmRows.getInt("mpa_id_in_mpa"),
+                            filmRows.getInt("mpa_id"),
                             filmRows.getString("mpa_name"))
             );
-            return Optional.of(setLikes(addGenreAndDirectorToFilm(film)));
+            film.setRating(filmRows.getInt("rating"));
+            return Optional.of(addGenreAndDirectorToFilm(film));
         } else {
             return Optional.empty();
         }
@@ -99,49 +101,30 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    public List<Film> findFilmsByDirectorId(int directorId) {
+    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
         directorService.findDirectorById(directorId)
-                .orElseThrow(() -> new InvalidIdException("Нет фильма с id " + directorId));
-        ArrayList<Integer> filmsId = makeListWithFilmsIdByDirectorId(directorId);
+                .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         ArrayList<Film> films = new ArrayList<>();
-        for (Integer filmId : filmsId) {
-            films.add(findFilmById(filmId).get());
+        SqlRowSet filmRows =
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(query,
+                        directorId);
+        while (filmRows.next()) {
+            films.add(makeFilm(filmRows));
         }
         return films;
     }
 
-    private ArrayList<Integer> makeListWithFilmsIdByDirectorId(int directorId) {
-        ArrayList<Integer> filmsId = new ArrayList<>();
-        SqlRowSet filmIdRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_ALL_FILMS_ID_BY_DIRECTOR_ID,
-                        directorId);
-        while (filmIdRows.next()) {
-            filmsId.add(filmIdRows.getInt("film_id"));
-        }
-        return filmsId;
-    }
-
-    private Film makeFilm(ResultSet rs) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("film_name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration");
-        int mpaId = rs.getInt("mpa_id_in_film");
-        String mpaName = rs.getString("mpa_name");
-
+    private Film makeFilm(SqlRowSet filmRows) {
+        int id = filmRows.getInt("film_id");
+        String name = filmRows.getString("film_name");
+        String description = filmRows.getString("description");
+        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
+        long duration = filmRows.getLong("duration");
+        int mpaId = filmRows.getInt("mpa_id");
+        String mpaName = filmRows.getString("mpa_name");
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        return setLikes(addGenreAndDirectorToFilm(film));
-    }
-
-    private Film setLikes(Film film) {
-        SqlRowSet likeRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_COUNT_LIKES, film.getId());
-        if (likeRows.next()) {
-            int likes = likeRows.getInt("likes");
-            film.setRating(likes);
-        }
-        return film;
+        film.setRating(filmRows.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
     }
 
     private Film addGenreAndDirectorToFilm(Film film) {
@@ -161,31 +144,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         return film;
     }
-/*
-    private Film addGenreAndDirectorToFilm(Film film) {
-        int filmId = film.getId();
-        SqlRowSet genreRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_BY_ID, filmId);
-        while (genreRows.next()) {
-            int genreId = genreRows.getInt("genre_id");
-            String genreName = genreRows.getString("genre_name");
-            if (genreId != 0 && genreName != null) {
-                film.addGenresToFilm(new Genre(genreId, genreName));
-            }
-        }
-        SqlRowSet directorRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_DIRECTOR_BY_ID, filmId);
-        directorRows.first();
-        while (directorRows.next()) {
-            int directorId = directorRows.getInt("director_id");
-            String directorName = directorRows.getString("director_name");
-            if (directorId != 0 && directorName != null) {
-                film.addDirectorToFilm(new Director(directorId, directorName));
-            }
-        }
-        return film;
-    }
-*/
+
     private Film installFilmGenresAndDirectors(Film film) {
         int filmId = film.getId();
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
@@ -222,7 +181,7 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("description", film.getDescription());
         parameters.addValue("release_date", String.valueOf(film.getReleaseDate()));
         parameters.addValue("duration", film.getDuration());
-        parameters.addValue("mpa_id_in_film", film.getMpa().getId());
+        parameters.addValue("mpa_id", film.getMpa().getId());
         return parameters;
     }
 
@@ -231,5 +190,18 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("film_id", filmId);
         parameters.addValue("user_id", userId);
         return parameters;
+    }
+
+    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
+        int id = rs.getInt("film_id");
+        String name = rs.getString("film_name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration");
+        int mpaId = rs.getInt("mpa_id");
+        String mpaName = rs.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(rs.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
     }
 }
