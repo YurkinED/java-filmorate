@@ -185,9 +185,7 @@ public class UserDbStorage implements UserStorage {
         return parameters;
     }
 
-
     public void deleteUserById(int userId) {
-        String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
-        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery, userId);
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
     }
 }

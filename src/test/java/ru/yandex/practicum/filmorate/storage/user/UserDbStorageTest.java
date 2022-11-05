@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,7 +26,7 @@ public class UserDbStorageTest {
     private final UserDbStorage userStorage;
     private final FilmDbStorage filmDbStorage;
 
-  /*  @Test
+    @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCreateUserWithFullData() {
         User testUser = new User(1, "solntmore@yandex.ru", RandomString.make(10),
@@ -118,7 +119,7 @@ public class UserDbStorageTest {
         Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
         Collection<User> friendsForUser4 = userStorage.showUserFriendsId(4);
 
-        assertEquals(2, friendsForUser1.size());
+        assertThat(friendsForUser1.size() == 2);
         assertThat(friendsForUser4.size() == 1);
 
     }
@@ -137,9 +138,11 @@ public class UserDbStorageTest {
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testDeleteUserByIdCheckAllUsers() {
         Collection<User> users = userStorage.findAllUsers();
-        userStorage.delete(1);
-        assertThat(users.size() == 3);
-    }*/
+        assertThat(users.size() == 4);
+        Collection<User> usersSecond = userStorage.findAllUsers();
+        userStorage.deleteUserById(1);
+        assertThat(usersSecond.size() == 3);
+    }
 
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})

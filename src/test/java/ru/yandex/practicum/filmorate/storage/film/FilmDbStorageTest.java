@@ -26,7 +26,7 @@ public class FilmDbStorageTest {
     private final static BaseEntity MPA = new BaseEntity(1);
     private final FilmDbStorage filmStorage;
 
-    /*@Test
+    @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllFilms() {
         Collection<Film> films = filmStorage.findAllFilms();
@@ -97,14 +97,16 @@ public class FilmDbStorageTest {
         filmStorage.likeFilmOrRemoveLike(1, 4, false);
         flag = filmStorage.checkLikeFilm(1, 4);
         assertThat(flag == false);
-    }*/
+    }
 
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testDeleteFilmByIdCheckAllFilms() {
-        filmStorage.deleteFilmById(1);
         Collection<Film> films = filmStorage.findAllFilms();
-        assertEquals(4, films.size());
+        assertEquals(5, films.size());
+        filmStorage.deleteFilmById(1);
+        Collection<Film> filmsSecond = filmStorage.findAllFilms();
+        assertEquals(4, filmsSecond.size());
     }
 
     @Test
