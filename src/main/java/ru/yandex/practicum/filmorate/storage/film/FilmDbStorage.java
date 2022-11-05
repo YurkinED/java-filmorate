@@ -165,4 +165,24 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("user_id", userId);
         return parameters;
     }
+
+    public Collection<Film> getRecommendations(int userId) {
+        SqlRowSet filmRows =
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_RECOMMENDED_FILMS, userId, userId, userId);
+        List<Film> returnList = new ArrayList<>();
+        while (filmRows.next()) {
+            Film film = new Film(
+                    filmRows.getInt("film_id"),
+                    filmRows.getString("film_name"),
+                    filmRows.getString("description"),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
+                    filmRows.getLong("duration"),
+                    new Mpa(
+                            filmRows.getInt("mpa_id_in_film"),
+                            filmRows.getString("mpa_name"))
+            );
+            returnList.add(film);
+        }
+        return returnList;
+    }
 }

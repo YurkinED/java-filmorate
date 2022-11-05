@@ -38,4 +38,22 @@ public class SqlQueryConstantsForFilm {
     public static final String SQL_QUERY_COUNT_LIKES = "SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = ?";
 
     public static final String SQL_QUERY_DELETE_FILMS_GENRE = "DELETE FROM films_genres WHERE film_id = ?";
+
+    public static final String SQL_QUERY_TAKE_RECOMMENDED_FILMS = "SELECT f.film_id," +
+            "    f.film_name," +
+            "    f.description," +
+            "    f.release_date," +
+            "    f.duration," +
+            "    f.mpa_id_in_film," +
+            "    m.mpa_name" +
+            "    FROM likes AS l" +
+            "    JOIN films    AS f    ON f.film_id =l.film_id" +
+            "    JOIN mpa    AS m    ON m.mpa_id_in_mpa =f.mpa_id_in_film" +
+            "    WHERE l.film_id NOT IN(SELECT film_id FROM likes WHERE user_id=?)" +
+            "    AND l.user_id IN(SELECT user_id FROM likes" +
+            " WHERE film_id IN(SELECT film_id FROM likes WHERE user_id=?)" +
+            "    AND user_id !=?" +
+            "    GROUP BY    user_id" +
+            "    ORDER BY    COUNT(film_id))";
+
 }

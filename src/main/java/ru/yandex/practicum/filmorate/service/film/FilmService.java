@@ -82,4 +82,8 @@ public class FilmService {
         log.info("Валидация в сервисе прошла успешно, объект {}", film);
         return filmStorage.updateFilm(film);
     }
+    public Collection<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
+    }
+
 }

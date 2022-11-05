@@ -4,22 +4,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FilmService filmService) {
         this.userService = userService;
+        this.filmService = filmService;
     }
 
     @GetMapping
@@ -75,9 +78,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/recommendations")
-    public void getRecommendations(@PathVariable int userId) {
-        log.debug("Получен запрос Get /users/{}/recommendations. Получить рекомендации по фильмама " +
-                "для пользователя по userId {}.", userId);
-//        return userService.showUserFriends(userId);
+    public Collection<Film> getRecommendations(@PathVariable int userId) {
+        log.info("Получен запрос Get /users/{}/recommendations. Получить рекомендации по фильмама " +
+                "для пользователя по userId {}.", userId, userId);
+        return filmService.getRecommendations(userId);
     }
 }
