@@ -50,7 +50,7 @@ public class FilmController {
 
     @GetMapping(value = {"/common"})
     public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
-        log.debug("Получен запрос GET common?userId={userId}&friendId={friendId}. Вывод общих с другом фильмов с сортировкой по их популярности..");
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..",userId, friendId);
         return filmService.showCommonLikedFilms(userId, friendId);
     }
 
