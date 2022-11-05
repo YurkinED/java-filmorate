@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -23,7 +24,7 @@ public class GenreDbStorageTest {
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllGenres() {
         Collection<Genre> genres = genreDbStorage.findAllGenres();
-        assertThat(genres.size() == 6);
+        assertEquals(6, genres.size());
     }
 
     @Test

@@ -11,6 +11,8 @@ import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -22,7 +24,7 @@ public class MpaDbStorageTest {
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllMpa() {
         Collection<Mpa> mpas = mpaDbStorage.findAllMpa();
-        assertThat(mpas.size() == 5);
+        assertEquals(5, mpas.size());
     }
 
     @Test

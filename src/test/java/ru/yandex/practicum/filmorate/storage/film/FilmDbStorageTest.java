@@ -122,7 +122,7 @@ public class FilmDbStorageTest {
         assertTrue(filmsSecondDirector.size() == 2);
 
         Film film = filmsFirstDirector.get(0);
-        assertTrue(film.getYear() == 2022);
+        assertTrue(film.getYear() == 2015);
     }
 
 

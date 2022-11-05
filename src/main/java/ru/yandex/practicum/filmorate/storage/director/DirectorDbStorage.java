@@ -20,7 +20,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_REMOVE_DIRECTOR;
 
 @Component
-public class DirectorDbStorage {
+public class DirectorDbStorage implements DirectorInterface {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
@@ -28,11 +28,13 @@ public class DirectorDbStorage {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    @Override
     public Collection<Director> findAllDirectors() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
                 .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> makeDirector(rs));
     }
 
+    @Override
     public Optional<Director> findDirectorById(int directorId) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_DIRECTOR_BY_ID, directorId);
@@ -46,6 +48,7 @@ public class DirectorDbStorage {
         }
     }
 
+    @Override
     public Director createDirector(Director director) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -56,6 +59,7 @@ public class DirectorDbStorage {
         return director;
     }
 
+    @Override
     public Director updateDirector(Director director) {
         int directorId = director.getId();
         findDirectorById(directorId)
@@ -66,18 +70,17 @@ public class DirectorDbStorage {
         return director;
     }
 
-    private Director makeDirector(ResultSet rs) throws SQLException {
-        int id = rs.getInt("director_id");
-        String name = rs.getString("director_name");
-        return new Director(id, name);
-    }
-
-
+    @Override
     public void removeDirector(int directorId) {
         findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("director_id", directorId);
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
+    }
+    private Director makeDirector(ResultSet rs) throws SQLException {
+        int id = rs.getInt("director_id");
+        String name = rs.getString("director_name");
+        return new Director(id, name);
     }
 }

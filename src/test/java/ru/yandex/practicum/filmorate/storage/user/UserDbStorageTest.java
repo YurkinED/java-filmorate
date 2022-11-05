@@ -13,13 +13,14 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageTest {
 
-    private final static LocalDate BIRTHDAY = LocalDate.of(1967, 03, 25);
+    private final static LocalDate BIRTHDAY = LocalDate.of(1967, 3, 25);
     private final UserDbStorage userStorage;
 
     @Test
@@ -47,7 +48,7 @@ public class UserDbStorageTest {
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllUsers() {
         Collection<User> users = userStorage.findAllUsers();
-        assertThat(users.size() == 4);
+        assertEquals(4, users.size());
     }
 
 
@@ -84,8 +85,8 @@ public class UserDbStorageTest {
         boolean trueFlag = userStorage.checkUserExists(1);
         boolean falseFlag = userStorage.checkUserExists(18);
 
-        assertThat(trueFlag == true);
-        assertThat(falseFlag == false);
+        assertTrue(trueFlag);
+        assertFalse(falseFlag);
     }
 
     @Test
@@ -94,19 +95,19 @@ public class UserDbStorageTest {
         boolean trueFlag = userStorage.checkFriendshipExists(1, 2);
         boolean falseFlag = userStorage.checkFriendshipExists(1, 4);
 
-        assertThat(trueFlag == true);
-        assertThat(falseFlag == false);
+        assertTrue(trueFlag);
+        assertFalse(falseFlag);
     }
 
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testAddToFriend() {
         boolean flag = userStorage.checkFriendshipExists(1, 4);
-        assertThat(flag == false);
+        assertFalse(flag);
 
         userStorage.addToFriend(1, 4);
         flag = userStorage.checkFriendshipExists(1, 4);
-        assertThat(flag == true);
+        assertTrue(flag);
     }
 
     @Test
@@ -115,8 +116,8 @@ public class UserDbStorageTest {
         Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
         Collection<User> friendsForUser4 = userStorage.showUserFriendsId(4);
 
-        assertThat(friendsForUser1.size() == 2);
-        assertThat(friendsForUser4.size() == 1);
+        assertEquals(2, friendsForUser1.size());
+        assertEquals(1, friendsForUser4.size());
 
     }
 
@@ -126,7 +127,7 @@ public class UserDbStorageTest {
         Collection<User> commonFriends1And2 = userStorage.showCommonFriends(1, 2);
         Collection<User> commonFriends2And4 = userStorage.showCommonFriends(2, 4);
 
-        assertThat(commonFriends1And2.size() == 1);
-        assertThat(commonFriends2And4.size() == 1);
+        assertEquals(1, commonFriends1And2.size());
+        assertEquals(1, commonFriends2And4.size());
     }
 }
