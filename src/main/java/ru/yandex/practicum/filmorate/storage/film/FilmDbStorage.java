@@ -186,6 +186,7 @@ public class FilmDbStorage implements FilmStorage {
             returnList.add(film);
         }
         return returnList;
+    }
 
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
