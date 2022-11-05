@@ -48,6 +48,13 @@ public class FilmController {
         }
     }
 
+    @GetMapping(value = {"/common"})
+    public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..",userId, friendId);
+        return filmService.showCommonLikedFilms(userId, friendId);
+    }
+
+
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
         log.debug("Получен запрос Post /films. Создать фильм {}", film);
@@ -79,5 +86,6 @@ public class FilmController {
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
         filmService.deleteFilmById(filmId);
     }
+
 
 }

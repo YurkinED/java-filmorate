@@ -68,7 +68,3 @@ create table friends
 );
 
 
-
-
-
-

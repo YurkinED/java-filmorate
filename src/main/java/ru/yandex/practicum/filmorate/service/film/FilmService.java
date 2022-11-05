@@ -63,6 +63,8 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
+
+
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
@@ -83,7 +85,12 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public List<Film> showCommonLikedFilms(int userId, int friendId) {
+        return filmStorage.commonLikedFilms(userId, friendId);
+    }
+
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
+
     }
 }
