@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS films_genres CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS likes CASCADE;
 DROP TABLE IF EXISTS friends CASCADE;
+DROP  table IF EXISTS FEEDS CASCADE;
 
 CREATE TABLE mpa
 (
@@ -55,6 +56,30 @@ CREATE TABLE friends
 (
     first_user_id int REFERENCES users(user_id),
     second_user_id int REFERENCES users(user_id)
+);
+
+create table FEEDS
+(
+    FEED_ID    INTEGER auto_increment
+        primary key,
+    USER_ID    INTEGER           not null,
+    EVENT_TYPE CHARACTER VARYING not null,
+    OPERATION  CHARACTER VARYING not null,
+    ENTITY_ID  INTEGER           not null,
+    TIME       TIMESTAMP         not null,
+    constraint FEEDS_FILM_FEED_FK
+        foreign key (ENTITY_ID) references FILMS
+            on delete cascade,
+    constraint FEEDS_USER_FEED_FK
+        foreign key (ENTITY_ID) references USERS
+            on delete cascade,
+    constraint FEEDS_USER_FK
+        foreign key (USER_ID) references USERS
+            on delete cascade,
+    constraint CHECK_EVENT_TYPE
+        check ("EVENT_TYPE" IN ('LIKE', 'REVIEW', 'FRIEND')),
+    constraint CHECK_OPERATION
+        check ("OPERATION" IN ('REMOVE', 'ADD', 'UPDATE'))
 );
 
 

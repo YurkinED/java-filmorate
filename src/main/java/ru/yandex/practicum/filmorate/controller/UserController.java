@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -74,4 +74,12 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
     }
 
+    @GetMapping("/{id}/feed")
+    public Collection<Feed> getUsersFeeds(@PathVariable int id) {
+        log.debug("Получен запрос Get /users/{}/feed. Показать действия пользователя с id {}.",
+                id, id);
+        userService.findUserById(id).orElseThrow(
+                () -> new InvalidIdException("К сожалению, пользователя с id " + id + " нет."));
+        return userService.showUsersFeeds(id);
+    }
 }

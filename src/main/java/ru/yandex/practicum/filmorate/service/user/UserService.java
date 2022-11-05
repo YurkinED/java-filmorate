@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
@@ -83,5 +84,9 @@ public class UserService {
     public User updateUser(User user) {
         userValidator.validator(user);
         return userDbStorage.updateUser(user);
+    }
+
+    public Collection<Feed> showUsersFeeds(int id) {
+        return userDbStorage.showUsersFeeds(id);
     }
 }
