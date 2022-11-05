@@ -181,6 +181,7 @@ public class FilmDbStorage implements FilmStorage {
                             filmRows.getInt("mpa_id_in_film"),
                             filmRows.getString("mpa_name"))
             );
+            addGenreToFilm(film);
             returnList.add(film);
         }
         return returnList;
