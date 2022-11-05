@@ -86,6 +86,6 @@ public class UserService {
     }
 
     public void deleteUserById(int userId) {
-        userDbStorage.delete(userId);
+        userDbStorage.deleteUserById(userId);
     }
 }

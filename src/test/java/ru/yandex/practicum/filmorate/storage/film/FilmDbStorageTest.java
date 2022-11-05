@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -24,7 +26,7 @@ public class FilmDbStorageTest {
     private final static BaseEntity MPA = new BaseEntity(1);
     private final FilmDbStorage filmStorage;
 
-    @Test
+    /*@Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllFilms() {
         Collection<Film> films = filmStorage.findAllFilms();
@@ -95,5 +97,21 @@ public class FilmDbStorageTest {
         filmStorage.likeFilmOrRemoveLike(1, 4, false);
         flag = filmStorage.checkLikeFilm(1, 4);
         assertThat(flag == false);
+    }*/
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteFilmByIdCheckAllFilms() {
+        filmStorage.deleteFilmById(1);
+        Collection<Film> films = filmStorage.findAllFilms();
+        assertEquals(4, films.size());
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteFilmByIdCheckLikes() {
+        filmStorage.deleteFilmById(1);
+        boolean flag = filmStorage.checkLikeFilm(1, 2);
+        assertFalse(flag);
     }
 }

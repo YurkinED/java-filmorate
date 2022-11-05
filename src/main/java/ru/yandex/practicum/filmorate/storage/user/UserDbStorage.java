@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -187,7 +186,7 @@ public class UserDbStorage implements UserStorage {
     }
 
 
-    public void delete(int userId) {
+    public void deleteUserById(int userId) {
         String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
         namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery, userId);
     }

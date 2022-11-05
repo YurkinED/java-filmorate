@@ -165,4 +165,9 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("user_id", userId);
         return parameters;
     }
+
+    public void deleteFilmById(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS WHERE FILM_ID = ?";
+        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery, filmId);
+    }
 }
