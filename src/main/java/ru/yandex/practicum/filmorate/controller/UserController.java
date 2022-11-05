@@ -74,4 +74,10 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
     }
 
+    @GetMapping("/{userId}/recommendations")
+    public void getRecommendations(@PathVariable int userId) {
+        log.debug("Получен запрос Get /users/{}/recommendations. Получить рекомендации по фильмама " +
+                "для пользователя по userId {}.", userId);
+//        return userService.showUserFriends(userId);
+    }
 }
