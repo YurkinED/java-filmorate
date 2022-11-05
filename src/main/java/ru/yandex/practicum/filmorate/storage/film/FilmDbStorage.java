@@ -166,10 +166,10 @@ public class FilmDbStorage implements FilmStorage {
         return parameters;
     }
 
-    public List<Film> commonLikedFilms(int userId, int friendId){
+    public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
-        List<Film> returnList=new ArrayList<>();
+        List<Film> returnList = new ArrayList<>();
         while (filmRows.next()) {
             Film film = new Film(
                     filmRows.getInt("film_id"),
@@ -183,6 +183,6 @@ public class FilmDbStorage implements FilmStorage {
             );
             returnList.add(film);
         }
-            return returnList;
+        return returnList;
     }
 }
