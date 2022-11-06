@@ -29,10 +29,12 @@ public class Film {
 
     private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
 
+    private Set<BaseEntity> directors = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
+
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, long duration, BaseEntity mpa) {
+   public Film(int id, String name, String description, LocalDate releaseDate, long duration, BaseEntity mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -41,33 +43,19 @@ public class Film {
         this.mpa = mpa;
     }
 
-    /*
-        public boolean addLike(int userId) {
-            if (!likes.contains(userId)) {
-                likes.add(userId);
-                log.debug("Пользователь {} поставил лайк");
-                return true;
-            }
-            return false;
-        }
-
-        public boolean removeLike(int userId) {
-            if (likes.contains(userId)) {
-                likes.remove(userId);
-                log.debug("Пользователь {} удалил лайк");
-                return true;
-            }
-            return false;
-        }
-
-
-        public int showQuantityOfLikes() {
-            return likes.size();
-        }
-    */
     public void addGenresToFilm(Genre genre) {
         log.info("Метод addGenresToFilm в фильме запущен {}", genre);
         genres.add(genre);
         log.info("Жанры добавлены в фильм {}", genre);
+    }
+
+    public void addDirectorToFilm(Director director) {
+        log.info("Метод addDirectorToFilm в фильме запущен {}", director);
+        directors.add(director);
+        log.info("Режиссеры добавлены в фильм {}", director);
+    }
+
+    public int getYear() {
+        return releaseDate.getYear();
     }
 }

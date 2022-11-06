@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.*;
+import ru.yandex.practicum.filmorate.exceptions.reviewExceptions.*;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidBirthDateException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidEmailException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginException;
@@ -30,7 +31,10 @@ public class ErrorHandler {
 
     @ExceptionHandler({InvalidNameException.class, LongDescriptionException.class, NegativeDurationException.class,
             ReleaseDateException.class, InvalidBirthDateException.class, InvalidEmailException.class,
-            InvalidLoginException.class, UserAlreadyExistException.class, MethodArgumentNotValidException.class})
+            InvalidLoginException.class, UserAlreadyExistException.class,
+            EmptyContentReviewException.class, InvalidFilmReviewException.class,
+            InvalidIsPositiveReviewException.class, InvalidUserReviewException.class,
+            LikeOrDislikeReviewException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateParameterException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());

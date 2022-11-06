@@ -90,11 +90,16 @@ public class UserService {
         return userDbStorage.updateUser(user);
     }
 
+
     public Collection<Feed> showUsersFeeds(int id) {
         return userDbStorage.showUsersFeeds(id);
     }
 
     public void createFeed (int userId, int entityId, int eventType, int operation){
         userDbStorage.createFeed(userId, entityId, eventType, operation);
+
+    public void deleteUserById(int userId) {
+        userDbStorage.deleteUserById(userId);
+
     }
 }
