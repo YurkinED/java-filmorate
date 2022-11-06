@@ -219,7 +219,7 @@ public class FilmDbStorage implements FilmStorage {
                     Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
                     filmRows.getLong("duration"),
                     new Mpa(
-                            filmRows.getInt("mpa_id_in_film"),
+                            filmRows.getInt("mpa_id"),
                             filmRows.getString("mpa_name"))
             );
             returnList.add(film);

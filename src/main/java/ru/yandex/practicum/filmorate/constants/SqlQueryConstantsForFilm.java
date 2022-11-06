@@ -74,10 +74,10 @@ public class SqlQueryConstantsForFilm {
             "        f.description, " +
             "        f.release_date, " +
             "        f.duration, " +
-            "        f.mpa_id_in_film, " +
+            "        f.mpa_id, " +
             "        m.mpa_name " +
             " FROM films AS f " +
-            " LEFT JOIN mpa AS m ON f.mpa_id_in_film = m.mpa_id_in_mpa "+
+            " LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id "+
             " LEFT JOIN (SELECT film_id, count(*) as cnt " +
             "            FROM likes group by film_id) AS likes_data ON f.film_id=likes_data.film_id "+
             " where f.film_id in       " +
