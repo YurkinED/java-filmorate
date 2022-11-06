@@ -54,18 +54,24 @@ public class ReviewService {
     }
 
     public Review updateReview(Review review) {
-        findReviewById(review.getReviewId());
+       Review reviewInBase = findReviewById(review.getReviewId());
         reviewValidator.validate(review);
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(()->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
         userStorage.findUserById(review.getUserId()).orElseThrow(()->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
+        userStorage.createFeed(reviewInBase.getUserId(), reviewInBase.getFilmId(),2,3);
+        log.warn("Добавлена информация в ленту: пользователь id {} обновил отзыв к фильму {}",
+                reviewInBase.getUserId(),reviewInBase.getFilmId());
         return reviewStorage.updateReview(review);
     }
 
     public void deleteReviewById(Integer id) {
-        findReviewById(id);
+        Review reviewForDelete = findReviewById(id);
         reviewStorage.deleteReviewById(id);
+        userStorage.createFeed (reviewForDelete.getUserId(), reviewForDelete.getFilmId(),2,1);
+        log.warn("Добавлена информация в ленту: пользователь id {} удалил отзыв к фильму {}",
+                reviewForDelete.getUserId(),reviewForDelete.getFilmId());
     }
 
     public void addLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {

@@ -193,7 +193,7 @@ public class UserDbStorage implements UserStorage {
                 "from users u\n" +
                 "         join feeds f on u.user_id = f.USER_ID join event_types  on event_type_id = f.event_type\n" +
                 "    join operations on operation_id = f.operation  WHERE f.user_id = ?;";
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(sql,
+        /*return namedParameterJdbcTemplate.getJdbcTemplate().query(sql,
                 (rs, rowNum) -> new Feed(
                         rs.getInt("feed_id"),
                         rs.getInt("user_id"),
@@ -201,7 +201,17 @@ public class UserDbStorage implements UserStorage {
                         rs.getString("event_type_name"),
                         rs.getString("operation_name"),
                         rs.getLong("creation_time")
-                ), id);
+                ), id);*/
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(sql, (rs, rowNum) ->
+                makeFeed(rs), id);
+    }
+    private Feed makeFeed(ResultSet rs)throws SQLException {
+        return new Feed(rs.getInt("feed_id"),
+                rs.getInt("user_id"),
+                rs.getInt("entity_id"),
+                rs.getString("event_type_name"),
+                rs.getString("operation_name"),
+                rs.getLong("creation_time"));
     }
 
     public void createFeed(int userId, int entityId, int eventType, int operation) {
