@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -141,5 +143,22 @@ public class FilmDbStorageTest {
         assertEquals(2015, film.getYear());
     }
 
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteFilmByIdCheckAllFilms() {
+        Collection<Film> films = filmStorage.findAllFilms();
+        assertEquals(5, films.size());
+        filmStorage.deleteFilmById(1);
+        Collection<Film> filmsSecond = filmStorage.findAllFilms();
+        assertEquals(4, filmsSecond.size());
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteFilmByIdCheckLikes() {
+        filmStorage.deleteFilmById(1);
+        boolean flag = filmStorage.checkLikeFilm(1, 2);
+        assertFalse(flag);
+    }
 
 }

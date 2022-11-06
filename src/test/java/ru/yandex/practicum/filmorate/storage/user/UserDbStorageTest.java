@@ -9,12 +9,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -23,6 +25,7 @@ public class UserDbStorageTest {
 
     private final static LocalDate BIRTHDAY = LocalDate.of(1967, 3, 25);
     private final UserDbStorage userStorage;
+    private final FilmDbStorage filmDbStorage;
 
     @Test
     @DisplayName("Тест на создание пользователя с корректными данными")
@@ -140,5 +143,33 @@ public class UserDbStorageTest {
 
         assertEquals(1, commonFriends1And2.size());
         assertEquals(1, commonFriends2And4.size());
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteUserByIdCheckAllUsers() {
+        Collection<User> users = userStorage.findAllUsers();
+        assertThat(users.size() == 4);
+        Collection<User> usersSecond = userStorage.findAllUsers();
+        userStorage.deleteUserById(1);
+        assertThat(usersSecond.size() == 3);
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteUserByIdCheckFriends() {
+        userStorage.deleteUserById(2);
+        Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
+        boolean falseFlag = userStorage.checkFriendshipExists(1, 2);
+        assertEquals(1, friendsForUser1.size());
+        assertFalse(falseFlag);
+    }
+
+    @Test
+    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
+    public void testDeleteUserByIdCheckLikes() {
+        userStorage.deleteUserById(2);
+        boolean flag = filmDbStorage.checkLikeFilm(1, 2);
+        assertFalse(flag);
     }
 }

@@ -51,6 +51,7 @@ public class FilmController {
         }
     }
 
+
     @GetMapping("director/{directorId}")
     public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam(name = "sortBy") String sortBy) {
         if (sortBy.equals("year")) {
@@ -63,6 +64,13 @@ public class FilmController {
             return filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
         }
     }
+
+    @GetMapping(value = {"/common"})
+    public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..",userId, friendId);
+        return filmService.showCommonLikedFilms(userId, friendId);
+    }
+
 
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
@@ -86,6 +94,14 @@ public class FilmController {
     public void removeLikeFromFilm(@PathVariable int filmId, @PathVariable int userId) {
         log.debug("Получен запрос Delete /films/{}/like/{}. Удалить лайк фильму.", filmId, userId);
         filmService.removeLikeFromFilm(filmId, userId);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void deleteFilmById(@PathVariable int filmId) {
+        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId " + filmId);
+        filmService.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
+        filmService.deleteFilmById(filmId);
     }
 
 
