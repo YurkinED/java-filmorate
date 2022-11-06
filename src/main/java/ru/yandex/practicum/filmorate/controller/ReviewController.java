@@ -18,6 +18,7 @@ public class ReviewController {
 
     @PostMapping
     Review createReview(@RequestBody Review review) {
+        log.debug("Получен запрос POST /reviews. Создать отзыв {}", review);
         return reviewService.createReview(review);
     }
 
@@ -26,44 +27,57 @@ public class ReviewController {
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
             @RequestParam(value = "filmId", required = false) Integer filmId) {
         if (Objects.isNull(filmId)) {
+            log.debug("Получен запрос GET /reviews?count={}. Показать {} отзывов", count, count);
             return reviewService.findAllReviewsWithLimit(count);
         } else {
+            log.debug("Получен запрос GET /reviews?filmId={}&count={}. Показать {} отзывов для фильма с id{}", filmId, count, count, filmId);
             return reviewService.findReviewByFilmIdWithLimit(filmId, count);
         }
     }
 
     @GetMapping("/{id}")
     Review findReviewById(@PathVariable Integer id) {
+        log.debug("Получен запрос GET /reviews/{}. Показать отзыв с id{}", id, id);
         return reviewService.findReviewById(id);
     }
 
     @PutMapping
     Review updateReview(@RequestBody Review review) {
+        log.debug("Получен запрос PUT /reviews. Обновить данные отзыва {}", review);
         return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/{id}")
     void deleteReview(@PathVariable Integer id) {
+        log.debug("Получен запрос DELETE /reviews/{}. Удалить отзыв с id{}", id, id);
         reviewService.deleteReviewById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
     void addLikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
+        log.debug("Получен запрос PUT /reviews/{}/like/{}. " +
+                "Поставить лайк отзыву с id{} от пользователя с id{}", id, userId, id, userId);
         reviewService.addLikeOrDislikeToReview(id, userId, Boolean.TRUE);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     void addDislikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
+        log.debug("Получен запрос PUT /reviews/{}/dislike/{}. " +
+                "Поставить дизлайк отзыву с id{} от пользователя с id{}", id, userId, id, userId);
         reviewService.addLikeOrDislikeToReview(id, userId, Boolean.FALSE);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     void deleteLikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
+        log.debug("Получен запрос DELETE /reviews/{}/like/{}. " +
+                "Удалить лайк у отзыва с id{} от пользователя с id{}", id, userId, id, userId);
         reviewService.deleteLikeOrDislikeToReview(id, userId, Boolean.TRUE);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     void deleteDislikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
+        log.debug("Получен запрос DELETE /reviews/{}/dislike/{}. " +
+                "Удалить дизлайк у отзыва с id{} от пользователя с id{}", id, userId, id, userId);
         reviewService.deleteLikeOrDislikeToReview(id, userId, Boolean.FALSE);
     }
 }
