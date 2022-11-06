@@ -15,7 +15,9 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -191,7 +193,7 @@ public class UserDbStorage implements UserStorage {
         String sql = "select f.feed_id, f.user_id, f.entity_id, event_type_name, operation_name, creation_time\n" +
                 "from users u\n" +
                 "         join feeds f on u.user_id = f.USER_ID join event_types  on event_type_id = f.event_type\n" +
-                "    join operations on operation_id = f.operation;";
+                "    join operations on operation_id = f.operation  WHERE f.user_id = ?;";
         return namedParameterJdbcTemplate.getJdbcTemplate().query(sql,
                 (rs, rowNum) -> new Feed(
                         rs.getInt("feed_id"),
@@ -199,8 +201,20 @@ public class UserDbStorage implements UserStorage {
                         rs.getInt("entity_id"),
                         rs.getString("event_type_name"),
                         rs.getString("operation_name"),
-                        rs.getTimestamp("creation_time")
+                        rs.getLong("creation_time")
                 ), id);
+    }
+
+    public void createFeed(int userId, int entityId, int eventType, int operation) {
+        LocalDateTime now = LocalDateTime.now();
+        String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +
+                "values (?, ?, ?, ?, ?)";
+        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery,
+                userId,
+                eventType,
+                operation,
+                entityId,
+                Timestamp.valueOf(now).getTime());
     }
 }
 

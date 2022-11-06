@@ -36,6 +36,8 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (!filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
+                userStorage.createFeed (userId, filmId,1,2);
+                log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы уже поставили лайк ранее.");
             }
@@ -49,6 +51,8 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
+                userStorage.createFeed (userId, filmId,1,1);
+                log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы еще не поставили лайк.");
             }

@@ -80,14 +80,9 @@ create table feeds
     event_type INTEGER not null,
     operation  INTEGER not null,
     entity_id  INTEGER           not null,
-    creation_time  TIMESTAMP         not null,
-    constraint feeds_film_FK
-        foreign key (entity_id) references films
-            on delete cascade,
+    creation_time  LONG         not null,
+
     constraint feeds_user_FK
-        foreign key (entity_id) references users
-            on delete cascade,
-    constraint feeds_user_id_FK
         foreign key (user_id) references users
             on delete cascade,
     constraint "event_type_FK"
