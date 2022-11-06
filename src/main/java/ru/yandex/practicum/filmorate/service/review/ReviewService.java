@@ -30,6 +30,9 @@ public class ReviewService {
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
         userStorage.findUserById(review.getUserId()).orElseThrow(()->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
+        userStorage.createFeed (review.getUserId(), review.getFilmId(), 2,2);
+        log.warn("Добавлена информация в ленту: пользователь id {} добавил отзыв к фильму {}",
+                review.getUserId(), review.getFilmId());
         return reviewStorage.saveReview(review);
     }
 
@@ -54,24 +57,28 @@ public class ReviewService {
     }
 
     public Review updateReview(Review review) {
-       Review reviewInBase = findReviewById(review.getReviewId());
+        Review checkReview = findReviewById(review.getReviewId());
+        /*if (review.getUserId() != checkReview.getUserId()){
+            throw new RuntimeException();
+        }*/
         reviewValidator.validate(review);
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(()->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
         userStorage.findUserById(review.getUserId()).orElseThrow(()->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
-        userStorage.createFeed(reviewInBase.getUserId(), reviewInBase.getFilmId(),2,3);
+        userStorage.createFeed (checkReview.getUserId(), checkReview.getFilmId(), 2,3);
         log.warn("Добавлена информация в ленту: пользователь id {} обновил отзыв к фильму {}",
-                reviewInBase.getUserId(),reviewInBase.getFilmId());
-        return reviewStorage.updateReview(review);
+                checkReview.getUserId(),checkReview.getFilmId());
+            Review updateReview = reviewStorage.updateReview(review);
+            return updateReview;
     }
 
     public void deleteReviewById(Integer id) {
-        Review reviewForDelete = findReviewById(id);
+        Review checkReview = findReviewById(id);
         reviewStorage.deleteReviewById(id);
-        userStorage.createFeed (reviewForDelete.getUserId(), reviewForDelete.getFilmId(),2,1);
+        userStorage.createFeed (checkReview.getUserId(),checkReview.getFilmId(), 2,1);
         log.warn("Добавлена информация в ленту: пользователь id {} удалил отзыв к фильму {}",
-                reviewForDelete.getUserId(),reviewForDelete.getFilmId());
+                checkReview.getUserId(), checkReview.getFilmId());
     }
 
     public void addLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {
