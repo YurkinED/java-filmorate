@@ -71,13 +71,14 @@ public class SqlQueryConstantsForFilm {
             "f.release_date, " +
             "f.duration, " +
             "f.mpa_id, " +
-            "m.mpa_name " +
+            "m.mpa_name, " +
+            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating " +
             "FROM likes AS l " +
-            "JOIN films AS f ON f.film_id =l.film_id " +
+            "JOIN films AS f ON f.film_id = l.film_id " +
             "JOIN mpa AS m ON m.mpa_id =f.mpa_id " +
-            "WHERE l.film_id NOT IN(SELECT film_id FROM likes WHERE user_id=?) " +
+            "WHERE l.film_id NOT IN(SELECT film_id FROM likes WHERE user_id = ?) " +
             "AND l.user_id IN(SELECT user_id FROM likes " +
-            "WHERE film_id IN(SELECT film_id FROM likes WHERE user_id=?) " +
+            "WHERE film_id IN(SELECT film_id FROM likes WHERE user_id = ?) " +
             "AND user_id !=? " +
             "GROUP BY user_id " +
             "ORDER BY COUNT(film_id))";
@@ -97,7 +98,7 @@ public class SqlQueryConstantsForFilm {
                     " FROM films AS f " +
                     " LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
                     " LEFT JOIN (SELECT film_id, count(*) as cnt " +
-                    "            FROM likes group by film_id) AS likes_data ON f.film_id=likes_data.film_id " +
+                    "            FROM likes group by film_id) AS likes_data ON f.film_id = likes_data.film_id " +
                     " where f.film_id in       " +
                     " (                        " +
                     "   SELECT t1.film_id " +

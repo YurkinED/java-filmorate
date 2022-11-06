@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
@@ -194,24 +195,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Collection<Film> getRecommendations(int userId) {
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_RECOMMENDED_FILMS, userId, userId, userId);
-        List<Film> returnList = new ArrayList<>();
-        while (filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("film_id"),
-                    filmRows.getString("film_name"),
-                    filmRows.getString("description"),
-                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
-                    filmRows.getLong("duration"),
-                    new Mpa(
-                            filmRows.getInt("mpa_id"),
-                            filmRows.getString("mpa_name"))
-            );
-            addGenreAndDirectorToFilm(film);
-            returnList.add(film);
-        }
-        return returnList;
+        return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
+                SQL_QUERY_TAKE_RECOMMENDED_FILMS,
+                (rowSet, rowNum) -> makeFilmFromRs(rowSet),
+                userId, userId, userId));
     }
 
     private Film makeFilmFromRs(ResultSet rs) throws SQLException {
@@ -225,7 +212,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
-        }
+    }
 
     public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
