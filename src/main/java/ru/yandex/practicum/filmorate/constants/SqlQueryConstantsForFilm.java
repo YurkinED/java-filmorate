@@ -109,3 +109,4 @@ public class SqlQueryConstantsForFilm {
                     "         FROM likes where user_id=?) AS t2 on t1.film_id=t2.film_id " +
                     " ) ORDER BY likes_data.cnt DESC NULLS LAST";
 }
+
