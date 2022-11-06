@@ -60,7 +60,6 @@ public class FilmService {
     }
 
 
-
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
@@ -81,6 +80,9 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public Collection<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
+    }
 
     public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
         return filmStorage.findFilmsByDirectorAndSort(directorId, query);
@@ -92,6 +94,5 @@ public class FilmService {
 
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
-
     }
 }

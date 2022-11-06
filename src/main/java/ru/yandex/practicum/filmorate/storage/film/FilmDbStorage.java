@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
@@ -193,6 +194,12 @@ public class FilmDbStorage implements FilmStorage {
         return parameters;
     }
 
+    public Collection<Film> getRecommendations(int userId) {
+        return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
+                SQL_QUERY_TAKE_RECOMMENDED_FILMS,
+                (rowSet, rowNum) -> makeFilmFromRs(rowSet),
+                userId, userId, userId));
+    }
 
     private Film makeFilmFromRs(ResultSet rs) throws SQLException {
         int id = rs.getInt("film_id");
@@ -205,7 +212,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
-        }
+    }
 
     public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
@@ -222,6 +229,7 @@ public class FilmDbStorage implements FilmStorage {
                             filmRows.getInt("mpa_id"),
                             filmRows.getString("mpa_name"))
             );
+            addGenreAndDirectorToFilm(film);
             returnList.add(film);
         }
         return returnList;
@@ -229,6 +237,5 @@ public class FilmDbStorage implements FilmStorage {
 
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
-
     }
 }

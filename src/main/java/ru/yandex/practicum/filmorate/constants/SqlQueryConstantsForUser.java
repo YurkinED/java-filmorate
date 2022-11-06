@@ -27,5 +27,4 @@ public class SqlQueryConstantsForUser {
 
     public static final String SQL_QUERY_REMOVE_DIRECTOR = "DELETE FROM directors WHERE director_id = :director_id";
 
-
 }
