@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING;
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR;
+
 @Slf4j
 @RestController
 @RequestMapping("/films")
@@ -45,6 +48,20 @@ public class FilmController {
         } else {
             log.debug("Получен запрос GET /films/popular. Показать топ 10 фильмов по лайкам.");
             return filmService.showMostLikedFilms(10);
+        }
+    }
+
+
+    @GetMapping("director/{directorId}")
+    public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam(name = "sortBy") String sortBy) {
+        if (sortBy.equals("year")) {
+            log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} по годам.",
+                    directorId, directorId);
+            return filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR);
+        } else {
+            log.debug("Получен запрос GET /films/director/{}?sortBy=[like]. Показать топ фильмов режиссера {} " +
+                    "по популярности.", directorId, directorId);
+            return filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
         }
     }
 

@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
@@ -58,8 +55,7 @@ public class FilmService {
     }
 
     public List<Film> showMostLikedFilms(int count) {
-        return filmStorage.findAllFilms()
-                .stream().sorted(Comparator.comparingLong(Film::getRating).reversed())
+        return filmStorage.findAllFilms().stream()
                 .limit(count).collect(Collectors.toList());
     }
 
@@ -83,6 +79,11 @@ public class FilmService {
         filmValidator.validator(film);
         log.info("Валидация в сервисе прошла успешно, объект {}", film);
         return filmStorage.updateFilm(film);
+    }
+
+
+    public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
+        return filmStorage.findFilmsByDirectorAndSort(directorId, query);
     }
 
     public List<Film> showCommonLikedFilms(int userId, int friendId) {

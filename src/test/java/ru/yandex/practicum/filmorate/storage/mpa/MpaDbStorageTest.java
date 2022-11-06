@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -19,13 +22,15 @@ public class MpaDbStorageTest {
 
     private final MpaDbStorage mpaDbStorage;
     @Test
+    @DisplayName("Тест на поиск всех mpa")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllMpa() {
         Collection<Mpa> mpas = mpaDbStorage.findAllMpa();
-        assertThat(mpas.size() == 5);
+        assertEquals(5, mpas.size());
     }
 
     @Test
+    @DisplayName("Тест на поиск mpa по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindMpaById() {
         Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(3);

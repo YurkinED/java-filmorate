@@ -35,7 +35,7 @@ public class MpaDbStorage implements MpaStorage {
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_MPA_BY_ID, mpaId);
         if (mpaRows.next()) {
             Mpa mpa = new Mpa(
-                    mpaRows.getInt("mpa_id_in_mpa"),
+                    mpaRows.getInt("mpa_id"),
                     mpaRows.getString("mpa_name"));
             return Optional.of(mpa);
         } else {
@@ -44,7 +44,7 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     private Mpa makeMpa(ResultSet rs) throws SQLException {
-        int id = rs.getInt("mpa_id_in_mpa");
+        int id = rs.getInt("mpa_id");
         String name = rs.getString("mpa_name");
         return new Mpa(id, name);
     }
