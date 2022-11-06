@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
 
 @Slf4j
 @Component
@@ -185,5 +186,30 @@ public class FilmDbStorage implements FilmStorage {
             returnList.add(film);
         }
         return returnList;
+    }
+
+    public List<Film> commonLikedFilms(int userId, int friendId) {
+        SqlRowSet filmRows =
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
+        List<Film> returnList = new ArrayList<>();
+        while (filmRows.next()) {
+            Film film = new Film(
+                    filmRows.getInt("film_id"),
+                    filmRows.getString("film_name"),
+                    filmRows.getString("description"),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
+                    filmRows.getLong("duration"),
+                    new Mpa(
+                            filmRows.getInt("mpa_id_in_film"),
+                            filmRows.getString("mpa_name"))
+            );
+            addGenreToFilm(film);
+            returnList.add(film);
+        }
+        return returnList;
+    }
+
+    public void deleteFilmById(int filmId) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
 }
