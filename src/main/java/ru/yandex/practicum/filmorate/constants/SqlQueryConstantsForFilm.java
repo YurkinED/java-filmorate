@@ -66,6 +66,23 @@ public class SqlQueryConstantsForFilm {
 
     public static final String SQL_QUERY_DELETE_FILMS_DIRECTORS = "DELETE FROM films_directors WHERE film_id = ?";
 
+    public static final String SQL_QUERY_FIND_FILM_BY_GENRE_YEAR_AND_SORT_BY_RATING = "SELECT f.film_id, f.film_name, " +
+            "f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+            "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            "LEFT JOIN films_genres fg on f.film_id = fg.film_id WHERE fg.genre_id = :genre_id AND " +
+            "EXTRACT(YEAR FROM f.release_date) = :year ORDER BY rating DESC";
+
+    public static final String SQL_QUERY_FIND_FILM_BY_GENRE_AND_SORT_BY_RATING = "SELECT f.film_id, f.film_name, " +
+            "f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+            "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            "LEFT JOIN films_genres fg on f.film_id = fg.film_id WHERE fg.genre_id = :genre_id " +
+            "ORDER BY rating DESC";
+
+    public static final String SQL_QUERY_FIND_FILM_BY_YEAR_AND_SORT_BY_RATING = "SELECT f.film_id, f.film_name, " +
+            "f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+            "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            "WHERE EXTRACT(YEAR FROM f.release_date) = :year ORDER BY rating DESC";
+
     public static final String SQL_QUERY_TAKE_COMMON_FILMS =
             " SELECT " +
             "        f.film_id, " +

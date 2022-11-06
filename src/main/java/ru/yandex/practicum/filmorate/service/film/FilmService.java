@@ -54,11 +54,10 @@ public class FilmService {
         }
     }
 
-    public List<Film> showMostLikedFilms(int count) {
+    public List<Film> showMostLikedFilms(int limit) {
         return filmStorage.findAllFilms().stream()
-                .limit(count).collect(Collectors.toList());
+                .limit(limit).collect(Collectors.toList());
     }
-
 
 
     public Collection<Film> findAllFilms() {
@@ -92,6 +91,10 @@ public class FilmService {
 
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
+    }
 
+    public List<Film> showMostLikedFilmsByYearAndGenre(Optional<Integer> limit, Optional<Integer> genreId,
+                                                       Optional<String> year, String query) {
+        return filmStorage.showMostLikedFilmsByYearAndGenre(limit, genreId, year, query);
     }
 }

@@ -115,6 +115,49 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    public List<Film> commonLikedFilms(int userId, int friendId) {
+        SqlRowSet filmRows =
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
+        List<Film> returnList = new ArrayList<>();
+        while (filmRows.next()) {
+            Film film = new Film(
+                    filmRows.getInt("film_id"),
+                    filmRows.getString("film_name"),
+                    filmRows.getString("description"),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
+                    filmRows.getLong("duration"),
+                    new Mpa(
+                            filmRows.getInt("mpa_id_in_film"),
+                            filmRows.getString("mpa_name"))
+            );
+            returnList.add(film);
+        }
+        return returnList;
+    }
+
+    public void deleteFilmById(int filmId) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
+    }
+
+    public List<Film> showMostLikedFilmsByYearAndGenre(Optional<Integer> limit, Optional<Integer> genreId,
+                                                       Optional<String> year, String query) {
+        ArrayList<Film> films = new ArrayList<>();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+
+        if (limit.isPresent())
+            parameters.addValue("limit", limit.get());
+        if (genreId.isPresent())
+            parameters.addValue("genre_id", genreId.get());
+        if (year.isPresent())
+            parameters.addValue("year", year.get());
+
+        SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(query, parameters);
+        while (filmRows.next()) {
+            films.add(makeFilm(filmRows));
+        }
+        return films;
+    }
+
     private Film makeFilm(SqlRowSet filmRows) {
         int id = filmRows.getInt("film_id");
         String name = filmRows.getString("film_name");
@@ -205,30 +248,5 @@ public class FilmDbStorage implements FilmStorage {
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
-        }
-
-    public List<Film> commonLikedFilms(int userId, int friendId) {
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
-        List<Film> returnList = new ArrayList<>();
-        while (filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("film_id"),
-                    filmRows.getString("film_name"),
-                    filmRows.getString("description"),
-                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
-                    filmRows.getLong("duration"),
-                    new Mpa(
-                            filmRows.getInt("mpa_id_in_film"),
-                            filmRows.getString("mpa_name"))
-            );
-            returnList.add(film);
-        }
-        return returnList;
-    }
-
-    public void deleteFilmById(int filmId) {
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
-
     }
 }

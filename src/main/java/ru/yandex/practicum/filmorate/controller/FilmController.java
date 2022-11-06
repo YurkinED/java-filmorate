@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING;
-import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR;
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 
 @Slf4j
 @RestController
@@ -35,16 +34,39 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable int filmId) {
-        log.debug("Получен запрос GET /films/{}. Найти фильм по filmId " + filmId);
+        log.debug("Получен запрос GET /films/{}. Найти фильм по filmId ", filmId);
         return filmService.findFilmById(filmId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
     }
 
-    @GetMapping(value = {"/popular", "/popular?count={count}"})
-    public List<Film> showMostLikedFilms(@RequestParam Optional<Integer> count) {
-        if (count.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?count={}. Показать топ {} фильмов по лайкам.", count, count);
-            return filmService.showMostLikedFilms(count.get());
+    @GetMapping(value = {"/popular", "/popular?count={limit}",
+            "/popular?count={limit}&genreId={genreId}&year={year}"})
+    public List<Film> showMostLikedFilms(@RequestParam(name = "count") Optional<Integer> limit,
+                                         @RequestParam(name = "genreId") Optional<Integer> genreId,
+                                         @RequestParam(name = "year") Optional<String> year) {
+
+        if (genreId.isPresent() && year.isPresent()) {
+            log.debug("Получен запрос GET /films/popular?genreId={}&year={}. Показать топ фильмов по лайкам " +
+                    "с id жанра {} за {} год.", genreId.get(), year.get(), genreId.get(), year.get());
+            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
+                    SQL_QUERY_FIND_FILM_BY_GENRE_YEAR_AND_SORT_BY_RATING);
+
+        } else if (genreId.isPresent()) {
+            log.debug("Получен запрос GET /films/popular?genreId={}. Показать топ фильмов по лайкам с id жанра {}.",
+                    genreId.get(), genreId.get());
+            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
+                    SQL_QUERY_FIND_FILM_BY_GENRE_AND_SORT_BY_RATING);
+
+        } else if (year.isPresent()) {
+            log.debug("Получен запрос GET /films/popular?year={}. Показать топ фильмов по лайкам с за {} год.",
+                    year.get(), year.get());
+            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
+                    SQL_QUERY_FIND_FILM_BY_YEAR_AND_SORT_BY_RATING);
+
+        } else if (limit.isPresent()) {
+            log.debug("Получен запрос GET /films/popular?count={}. Показать топ {} фильмов по лайкам.", limit, limit);
+            return filmService.showMostLikedFilms(limit.get());
+
         } else {
             log.debug("Получен запрос GET /films/popular. Показать топ 10 фильмов по лайкам.");
             return filmService.showMostLikedFilms(10);
@@ -67,7 +89,7 @@ public class FilmController {
 
     @GetMapping(value = {"/common"})
     public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
-        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..",userId, friendId);
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..", userId, friendId);
         return filmService.showCommonLikedFilms(userId, friendId);
     }
 
@@ -98,7 +120,7 @@ public class FilmController {
 
     @DeleteMapping("/{filmId}")
     public void deleteFilmById(@PathVariable int filmId) {
-        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId " + filmId);
+        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId ", filmId);
         filmService.findFilmById(filmId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
         filmService.deleteFilmById(filmId);
