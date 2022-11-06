@@ -92,5 +92,4 @@ public class UserController {
                 () -> new InvalidIdException("К сожалению, пользователя с id " + userId + " нет."));
         userService.deleteUserById(userId);
     }
-
 }

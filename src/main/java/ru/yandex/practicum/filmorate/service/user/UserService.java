@@ -32,7 +32,7 @@ public class UserService {
             if (!userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.addToFriend(userId, friendId);
                 log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
-                createFeed (userId, friendId,3,2);
+                createFeed(userId, friendId, 3, 2);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} стали друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} уже друзья", userId, friendId);
@@ -52,7 +52,7 @@ public class UserService {
             if (userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.removeFromFriends(userId, friendId);
                 log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
-                createFeed (userId, friendId,3,1);
+                createFeed(userId, friendId, 3, 1);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} перестали быть друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} не друзья ", userId, friendId);
@@ -95,11 +95,13 @@ public class UserService {
         return userDbStorage.showUsersFeeds(id);
     }
 
-    public void createFeed (int userId, int entityId, int eventType, int operation){
+    public void createFeed(int userId, int entityId, int eventType, int operation) {
         userDbStorage.createFeed(userId, entityId, eventType, operation);
+    }
 
     public void deleteUserById(int userId) {
         userDbStorage.deleteUserById(userId);
 
     }
+
 }
