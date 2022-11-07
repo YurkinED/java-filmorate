@@ -26,10 +26,10 @@ public class SqlQueryConstantsForUser {
     public static final String SQL_QUERY_DELETE_FILM_BY_ID = "DELETE FROM films WHERE film_id = ?";
 
     public static final String SQL_QUERY_REMOVE_DIRECTOR = "DELETE FROM directors WHERE director_id = :director_id";
+
     public static final String SQL_QUERY_SHOW_FEEDS_BY_USER_ID = "SELECT f.feed_id, f.user_id, f.entity_id, " +
             "event_type_name, operation_name, creation_time\n" +
             "FROM users u\n" +
             "         JOIN feeds f ON u.user_id = f.USER_ID JOIN event_types  ON event_type_id = f.event_type\n" +
             "    JOIN operations ON operation_id = f.operation WHERE f.user_id = ?";
-
 }

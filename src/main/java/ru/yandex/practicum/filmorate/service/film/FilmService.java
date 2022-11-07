@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -64,7 +65,6 @@ public class FilmService {
     }
 
 
-
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
@@ -85,6 +85,9 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public Collection<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
+    }
 
     public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
         return filmStorage.findFilmsByDirectorAndSort(directorId, query);
@@ -96,6 +99,17 @@ public class FilmService {
 
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
+    }
 
+    public List<Film> searchFilms(String query, List<String> by) {
+        if (by.contains("title") && by.contains("director")) {
+            return filmStorage.searchFilmsByTitleAndDirector(query);
+        } else if (by.contains("title") && by.size() == 1) {
+            return filmStorage.searchFilmsByTitle(query);
+        } else if (by.contains("director") && by.size() == 1){
+            return filmStorage.searchFilmsByDirector(query);
+        } else {
+            throw new BadSearchQueryException("Введен неверный поисковый запрос");
+        }
     }
 }

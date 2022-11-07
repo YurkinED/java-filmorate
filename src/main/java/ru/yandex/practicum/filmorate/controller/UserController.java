@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
@@ -16,10 +18,12 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FilmService filmService) {
         this.userService = userService;
+        this.filmService = filmService;
     }
 
     @GetMapping
@@ -83,6 +87,13 @@ public class UserController {
         userService.findUserById(id).orElseThrow(
                 () -> new InvalidIdException("К сожалению, пользователя с id " + id + " нет."));
         return userService.showUsersFeeds(id);
+    }
+
+    @GetMapping("/{userId}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable int userId) {
+        log.info("Получен запрос Get /users/{}/recommendations. Получить рекомендации по фильмама " +
+                "для пользователя по userId {}.", userId, userId);
+        return filmService.getRecommendations(userId);
     }
 
     @DeleteMapping("/{userId}")
