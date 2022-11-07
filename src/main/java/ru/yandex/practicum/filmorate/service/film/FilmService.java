@@ -61,12 +61,6 @@ public class FilmService {
         }
     }
 
-    public List<Film> showMostLikedFilms(int count) {
-        return filmStorage.findAllFilms().stream()
-                .limit(count).collect(Collectors.toList());
-    }
-
-
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
@@ -103,6 +97,10 @@ public class FilmService {
         filmStorage.deleteFilmById(filmId);
     }
 
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+        return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
+}
+
     public List<Film> searchFilms(String query, List<String> by) {
         if (by.contains("title") && by.contains("director")) {
             return filmStorage.searchFilmsByTitleAndDirector(query);
@@ -113,5 +111,6 @@ public class FilmService {
         } else {
             throw new BadSearchQueryException("Введен неверный поисковый запрос");
         }
+
     }
 }

@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING;
-import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR;
+import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 
 @Slf4j
 @RestController
@@ -40,15 +39,14 @@ public class FilmController {
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
     }
 
-    @GetMapping(value = {"/popular", "/popular?count={count}"})
-    public List<Film> showMostLikedFilms(@RequestParam Optional<Integer> count) {
-        if (count.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?count={}. Показать топ {} фильмов по лайкам.", count, count);
-            return filmService.showMostLikedFilms(count.get());
-        } else {
-            log.debug("Получен запрос GET /films/popular. Показать топ 10 фильмов по лайкам.");
-            return filmService.showMostLikedFilms(10);
-        }
+    @GetMapping(value = {"/popular"})
+    public List<Film> showMostLikedFilms(@RequestParam(name = "count", required = false, defaultValue = "10") Integer limit,
+                                         @RequestParam(name = "genreId", required = false, defaultValue = "0") Integer genreId,
+                                         @RequestParam(name = "year",  required = false, defaultValue = "0") String year) {
+
+        log.debug("Получен запрос GET /films/popular?count={}&genreId={}&year={}. Показать топ фильмов по лайкам " +
+                "с id жанра {} за {} год.",limit, genreId, year, genreId, year);
+        return filmService.showMostLikedFilmsFilter(limit, genreId, year);
     }
 
 
@@ -67,7 +65,7 @@ public class FilmController {
 
     @GetMapping(value = {"/common"})
     public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
-        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..",userId, friendId);
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..", userId, friendId);
         return filmService.showCommonLikedFilms(userId, friendId);
     }
 

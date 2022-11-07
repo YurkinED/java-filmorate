@@ -115,6 +115,26 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    public List<Film> commonLikedFilms(int userId, int friendId) {
+        SqlRowSet filmRows =
+                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
+        List<Film> returnList = new ArrayList<>();
+        while (filmRows.next()) {
+            Film film = new Film(
+                    filmRows.getInt("film_id"),
+                    filmRows.getString("film_name"),
+                    filmRows.getString("description"),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
+                    filmRows.getLong("duration"),
+                    new Mpa(
+                            filmRows.getInt("mpa_id"),
+                            filmRows.getString("mpa_name"))
+            );
+            returnList.add(film);
+        }
+        return returnList;
+    }
+
     private Film makeFilm(SqlRowSet filmRows) {
         int id = filmRows.getInt("film_id");
         String name = filmRows.getString("film_name");
@@ -127,6 +147,25 @@ public class FilmDbStorage implements FilmStorage {
         film.setRating(filmRows.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
     }
+
+    public void deleteFilmById(int filmId) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
+    }
+
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+        ArrayList<Film> films = new ArrayList<>();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+
+        parameters.addValue("genre_id", genreId);
+        parameters.addValue("year", year);
+        parameters.addValue("limit", limit);
+        SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_FIND_FILM_FILTER, parameters);
+        while (filmRows.next()) {
+            films.add(makeFilm(filmRows));
+        }
+        return films;
+    }
+
 
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
@@ -176,6 +215,9 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+
+
+
     private MapSqlParameterSource getFilmParameters(Film film) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("film_name", film.getName());
@@ -211,31 +253,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
-    }
 
-    public List<Film> commonLikedFilms(int userId, int friendId) {
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
-        List<Film> returnList = new ArrayList<>();
-        while (filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("film_id"),
-                    filmRows.getString("film_name"),
-                    filmRows.getString("description"),
-                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
-                    filmRows.getLong("duration"),
-                    new Mpa(
-                            filmRows.getInt("mpa_id"),
-                            filmRows.getString("mpa_name"))
-            );
-            addGenreAndDirectorToFilm(film);
-            returnList.add(film);
-        }
-        return returnList;
-    }
-
-    public void deleteFilmById(int filmId) {
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
 
     public List<Film> searchFilmsByTitle(String query) {
