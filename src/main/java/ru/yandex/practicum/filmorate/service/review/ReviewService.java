@@ -61,6 +61,9 @@ public class ReviewService {
         /*if (review.getUserId() != checkReview.getUserId()){
             throw new RuntimeException();
         }*/
+        Review updateReviewCreate = review;
+        updateReviewCreate.setUserId(checkReview.getUserId());
+        updateReviewCreate.setFilmId(checkReview.getFilmId());
         reviewValidator.validate(review);
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(()->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
@@ -69,7 +72,7 @@ public class ReviewService {
         userStorage.createFeed (checkReview.getUserId(), checkReview.getFilmId(), 2,3);
         log.warn("Добавлена информация в ленту: пользователь id {} обновил отзыв к фильму {}",
                 checkReview.getUserId(),checkReview.getFilmId());
-            Review updateReview = reviewStorage.updateReview(review);
+            Review updateReview = reviewStorage.updateReview(updateReviewCreate);
             return updateReview;
     }
 
