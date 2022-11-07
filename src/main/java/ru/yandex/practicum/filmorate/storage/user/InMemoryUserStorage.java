@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@Deprecated
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
 

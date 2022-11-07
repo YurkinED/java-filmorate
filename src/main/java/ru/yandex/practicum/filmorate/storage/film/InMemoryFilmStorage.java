@@ -13,6 +13,7 @@ import java.util.*;
 
 @Slf4j
 @Component
+@Deprecated
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     @Autowired

@@ -3,12 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 @Slf4j
-@Getter
-@Setter
+@Data
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor

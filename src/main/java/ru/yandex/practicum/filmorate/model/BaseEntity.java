@@ -4,10 +4,8 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode
-@ToString
 public class BaseEntity {
     private int id;
 }

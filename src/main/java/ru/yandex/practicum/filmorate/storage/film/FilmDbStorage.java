@@ -10,7 +10,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.service.director.DirectorService;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

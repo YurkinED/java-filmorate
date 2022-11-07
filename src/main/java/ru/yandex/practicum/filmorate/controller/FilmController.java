@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 
@@ -43,7 +42,6 @@ public class FilmController {
     public List<Film> showMostLikedFilms(@RequestParam(name = "count", required = false, defaultValue = "10") Integer limit,
                                          @RequestParam(name = "genreId", required = false, defaultValue = "0") Integer genreId,
                                          @RequestParam(name = "year",  required = false, defaultValue = "0") String year) {
-
         log.debug("Получен запрос GET /films/popular?count={}&genreId={}&year={}. Показать топ фильмов по лайкам " +
                 "с id жанра {} за {} год.",limit, genreId, year, genreId, year);
         return filmService.showMostLikedFilmsFilter(limit, genreId, year);
