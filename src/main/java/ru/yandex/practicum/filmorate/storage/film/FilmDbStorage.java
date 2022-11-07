@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
@@ -164,9 +163,9 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
-        Set<BaseEntity> directors = film.getDirectors();
+        Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
-            for (BaseEntity element : film.getDirectors()) {
+            for (Director element : film.getDirectors()) {
                 int directorId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
@@ -238,4 +237,24 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
+
+    public List<Film> searchFilmsByTitle(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    public List<Film> searchFilmsByDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    public List<Film> searchFilmsByTitleAndDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
+    }
+
+
 }

@@ -34,7 +34,8 @@ public class ErrorHandler {
             InvalidLoginException.class, UserAlreadyExistException.class,
             EmptyContentReviewException.class, InvalidFilmReviewException.class,
             InvalidIsPositiveReviewException.class, InvalidUserReviewException.class,
-            LikeOrDislikeReviewException.class, MethodArgumentNotValidException.class})
+            LikeOrDislikeReviewException.class, BadSearchQueryException.class,
+            MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateParameterException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
