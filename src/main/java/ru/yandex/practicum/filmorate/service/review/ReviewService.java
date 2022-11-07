@@ -64,6 +64,7 @@ public class ReviewService {
         Review updateReviewCreate = review;
         updateReviewCreate.setUserId(checkReview.getUserId());
         updateReviewCreate.setFilmId(checkReview.getFilmId());
+        updateReviewCreate.setUseful(checkReview.getUseful());
         reviewValidator.validate(review);
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(()->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
