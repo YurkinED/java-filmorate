@@ -146,7 +146,6 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("genre_id", genreId);
         parameters.addValue("year", year);
         parameters.addValue("limit", limit);
-        System.out.println(SQL_QUERY_FIND_FILM_FILTER);
         SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_FIND_FILM_FILTER, parameters);
         while (filmRows.next()) {
             films.add(makeFilm(filmRows));
