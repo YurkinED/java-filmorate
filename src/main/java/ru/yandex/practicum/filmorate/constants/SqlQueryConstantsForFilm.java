@@ -85,7 +85,7 @@ public class SqlQueryConstantsForFilm {
 
     public static final String SQL_QUERY_DELETE_FILMS_DIRECTORS = "DELETE FROM films_directors WHERE film_id = ?";
     public static final String SQL_QUERY_FIND_FILM_FILTER= "" +
-            "SELECT                                             \n" +
+            "SELECT DISTINCT                                            \n" +
             "       f.film_id,                                  \n" +
             "       f.film_name,                                \n" +
             "       f.description,                              \n" +
