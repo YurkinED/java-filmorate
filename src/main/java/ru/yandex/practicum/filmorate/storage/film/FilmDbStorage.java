@@ -239,7 +239,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> searchFilmByTitle(String query) {
-        /*String sqlQuery = ""*/
+        String sqlQuery = "SELECT f.film_id, f.film_name, f.description, " +
+                "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+                "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                "ORDER BY rating DESC";
         return null;
     }
 
