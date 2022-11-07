@@ -14,8 +14,7 @@ public class SqlQueryConstantsForReview {
 
     public static final String SQL_QUERY_UPDATE_REVIEW =
             "UPDATE reviews SET content = :content, " +
-                    "isPositive = :isPositive, useful = :useful, user_id = :user_id, " +
-                    "film_id = :film_id WHERE review_id = :review_id";
+                    "isPositive = :isPositive WHERE review_id = :review_id";
 
     public static final String SQL_QUERY_DELETE_REVIEW_BY_ID =
             "DELETE FROM reviews " +
@@ -31,4 +30,8 @@ public class SqlQueryConstantsForReview {
     public static final String SQL_QUERY_DELETE_LIKE_OR_DISLIKE =
             "DELETE FROM reviews_likes " +
                     "WHERE review_id = ? AND user_id = ?";
+
+    public static final String SQL_QUERY_UPDATE_USEFUL =
+            "UPDATE reviews SET useful = :useful " +
+                    "WHERE review_id = :review_id";
 }
