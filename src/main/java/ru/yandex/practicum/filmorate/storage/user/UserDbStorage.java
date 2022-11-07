@@ -9,11 +9,15 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -185,7 +189,34 @@ public class UserDbStorage implements UserStorage {
         return parameters;
     }
 
+    public Collection<Feed> showUsersFeeds(int id) {
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
+                (rs, rowNum) -> makeFeed(id, rs), id);
+    }
+
+    private Feed makeFeed(int id, ResultSet rs) throws SQLException {
+        return new Feed(rs.getInt("feed_id"),
+                id,
+                rs.getInt("entity_id"),
+                rs.getString("event_type_name"),
+                rs.getString("operation_name"),
+                rs.getLong("creation_time"));
+    }
+
+    public void createFeed(int userId, int entityId, int eventType, int operation) {
+        LocalDateTime now = LocalDateTime.now();
+        String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +
+                "values (?, ?, ?, ?, ?)";
+        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery,
+                userId,
+                eventType,
+                operation,
+                entityId,
+                Timestamp.valueOf(now).getTime());
+    }
+
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
     }
 }
+

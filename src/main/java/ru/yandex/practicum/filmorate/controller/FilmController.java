@@ -34,7 +34,7 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable int filmId) {
-        log.debug("Получен запрос GET /films/{}. Найти фильм по filmId ", filmId);
+        log.debug("Получен запрос GET /films/{}. Найти фильм по filmId{} ", filmId, filmId);
         return filmService.findFilmById(filmId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
     }
@@ -96,11 +96,15 @@ public class FilmController {
 
     @DeleteMapping("/{filmId}")
     public void deleteFilmById(@PathVariable int filmId) {
-        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId ", filmId);
+        log.debug("Получен запрос DELETE /films/{}. Удалить фильм по filmId{} ", filmId, filmId);
         filmService.findFilmById(filmId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
         filmService.deleteFilmById(filmId);
     }
 
-
+    @GetMapping("/search")
+    public List<Film> searchFilms(@RequestParam String query, @RequestParam List<String> by) {
+        log.debug("Получен запрос GET /films/search. Найти фильм по запросу {} ", query);
+        return filmService.searchFilms(query, by);
+    }
 }

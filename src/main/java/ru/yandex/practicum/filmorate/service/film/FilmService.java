@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -12,6 +13,8 @@ import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 
 @Slf4j
 @Service
@@ -33,6 +36,8 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (!filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
+                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_ADD);
+                log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы уже поставили лайк ранее.");
             }
@@ -46,6 +51,8 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
+                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_REMOVE);
+                log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы еще не поставили лайк.");
             }
@@ -74,6 +81,9 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public Collection<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
+    }
 
     public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
         return filmStorage.findFilmsByDirectorAndSort(directorId, query);
@@ -87,8 +97,20 @@ public class FilmService {
         filmStorage.deleteFilmById(filmId);
     }
 
-
     public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
+}
+
+    public List<Film> searchFilms(String query, List<String> by) {
+        if (by.contains("title") && by.contains("director")) {
+            return filmStorage.searchFilmsByTitleAndDirector(query);
+        } else if (by.contains("title") && by.size() == 1) {
+            return filmStorage.searchFilmsByTitle(query);
+        } else if (by.contains("director") && by.size() == 1){
+            return filmStorage.searchFilmsByDirector(query);
+        } else {
+            throw new BadSearchQueryException("Введен неверный поисковый запрос");
+        }
+
     }
 }
