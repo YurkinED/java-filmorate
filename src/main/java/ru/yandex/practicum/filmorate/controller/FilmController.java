@@ -44,7 +44,7 @@ public class FilmController {
                                          @RequestParam(name = "genreId", required = false, defaultValue = "0") Integer genreId,
                                          @RequestParam(name = "year",  required = false, defaultValue = "0") String year) {
 
-        log.debug("Получен запрос GET /films/popular?count={}, genreId={}&year={}. Показать топ фильмов по лайкам " +
+        log.debug("Получен запрос GET /films/popular?count={}&genreId={}&year={}. Показать топ фильмов по лайкам " +
                 "с id жанра {} за {} год.",limit, genreId, year);
         return filmService.showMostLikedFilmsFilter(limit, genreId, year);
     }
