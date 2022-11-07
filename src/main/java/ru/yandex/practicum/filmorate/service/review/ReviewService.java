@@ -81,7 +81,7 @@ public class ReviewService {
         } else {
             review.setUseful(review.getUseful() - 1);
         }
-        reviewStorage.updateReview(review);
+        reviewStorage.updateUsefulInReview(review);
     }
 
     public void deleteLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {
@@ -95,6 +95,6 @@ public class ReviewService {
         } else {
             review.setUseful(review.getUseful() + 1);
         }
-        reviewStorage.updateReview(review);
+        reviewStorage.updateUsefulInReview(review);
     }
 }
