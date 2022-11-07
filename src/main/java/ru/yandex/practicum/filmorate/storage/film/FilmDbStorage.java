@@ -164,9 +164,9 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
-        Set<BaseEntity> directors = film.getDirectors();
+        Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
-            for (BaseEntity element : film.getDirectors()) {
+            for (Director element : film.getDirectors()) {
                 int directorId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
