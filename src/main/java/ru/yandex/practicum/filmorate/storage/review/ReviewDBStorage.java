@@ -61,7 +61,6 @@ public class ReviewDBStorage implements ReviewStorage {
     public Review updateReview(Review review) {
         MapSqlParameterSource parameters = getReviewParameters(review);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_REVIEW, parameters);
-
         return findReviewById(review.getReviewId()).orElseThrow(
                 () -> new InvalidIdException("Отзыв с id" + review.getReviewId() + " не найден")
         );
@@ -94,8 +93,6 @@ public class ReviewDBStorage implements ReviewStorage {
     public void deleteLikeOrDislikeToReview(Integer id, Integer userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_LIKE_OR_DISLIKE, id, userId);
     }
-
-
 
     private MapSqlParameterSource getReviewParameters(Review review) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
