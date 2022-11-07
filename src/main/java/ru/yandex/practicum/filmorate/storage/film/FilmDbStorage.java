@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
@@ -238,4 +237,11 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
+
+    public List<Film> searchFilmByTitle(String query) {
+        /*String sqlQuery = ""*/
+        return null;
+    }
+
+
 }

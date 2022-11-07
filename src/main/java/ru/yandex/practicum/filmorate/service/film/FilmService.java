@@ -95,4 +95,8 @@ public class FilmService {
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
     }
+
+    public List<Film> searchFilms(String query, List<String> by) {
+        return null;
+    }
 }
