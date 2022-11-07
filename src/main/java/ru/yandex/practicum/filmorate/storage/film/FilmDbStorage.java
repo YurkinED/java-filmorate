@@ -205,7 +205,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
-        }
+    }
 
     public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
@@ -229,6 +229,5 @@ public class FilmDbStorage implements FilmStorage {
 
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
-
     }
 }

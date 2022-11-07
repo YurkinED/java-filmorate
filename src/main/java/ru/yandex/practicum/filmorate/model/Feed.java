@@ -20,14 +20,4 @@ public class Feed {
     private String eventType;
     private String operation;
     private Long timestamp;
-
-    /*public Feed(int eventId, int userId, int entityId, String eventType, String operation) {
-        this.eventId = eventId;
-        this.userId = userId;
-        this.entityId = entityId;
-        this.eventType = eventType;
-        this.operation = operation;
-        timestamp = Timestamp.valueOf(LocalDateTime.now()).getTime();
-    }*/
-
 }

@@ -189,13 +189,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     public Collection<Feed> showUsersFeeds(int id) {
-        String sql = "select f.feed_id, f.user_id, f.entity_id, event_type_name, operation_name, creation_time\n" +
-                "from users u\n" +
-                "         join feeds f on u.user_id = f.USER_ID join event_types  on event_type_id = f.event_type\n" +
-                "    join operations on operation_id = f.operation  WHERE f.user_id = ?;";
-
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(sql, (rs, rowNum) -> makeFeed(id, rs), id);
-
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
+                (rs, rowNum) -> makeFeed(id, rs), id);
     }
 
     private Feed makeFeed(int id, ResultSet rs) throws SQLException {
@@ -206,7 +201,6 @@ public class UserDbStorage implements UserStorage {
                 rs.getString("operation_name"),
                 rs.getLong("creation_time"));
     }
-
 
     public void createFeed(int userId, int entityId, int eventType, int operation) {
         LocalDateTime now = LocalDateTime.now();
@@ -222,7 +216,6 @@ public class UserDbStorage implements UserStorage {
 
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
-
     }
 }
 
