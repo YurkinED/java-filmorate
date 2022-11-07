@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
@@ -60,6 +61,15 @@ public class ReviewDBStorage implements ReviewStorage {
     public Review updateReview(Review review) {
         MapSqlParameterSource parameters = getReviewParameters(review);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_REVIEW, parameters);
+        return findReviewById(review.getReviewId()).orElseThrow(
+                () -> new InvalidIdException("Отзыв с id" + review.getReviewId() + " не найден")
+        );
+    }
+
+    @Override
+    public Review updateUsefulInReview(Review review) {
+        MapSqlParameterSource parameters = getReviewParameters(review);
+        namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_USEFUL, parameters);
         return review;
     }
 
