@@ -54,12 +54,6 @@ public class FilmService {
         }
     }
 
-    public List<Film> showMostLikedFilms(int limit) {
-        return filmStorage.findAllFilms().stream()
-                .limit(limit).collect(Collectors.toList());
-    }
-
-
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
