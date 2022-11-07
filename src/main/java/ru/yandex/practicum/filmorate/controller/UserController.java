@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
@@ -79,12 +80,22 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
     }
 
+    @GetMapping("/{id}/feed")
+    public Collection<Feed> getUsersFeeds(@PathVariable int id) {
+        log.debug("Получен запрос Get /users/{}/feed. Показать действия пользователя с id {}.",
+                id, id);
+        userService.findUserById(id).orElseThrow(
+                () -> new InvalidIdException("К сожалению, пользователя с id " + id + " нет."));
+        return userService.showUsersFeeds(id);
+    }
+
     @GetMapping("/{userId}/recommendations")
     public Collection<Film> getRecommendations(@PathVariable int userId) {
         log.info("Получен запрос Get /users/{}/recommendations. Получить рекомендации по фильмама " +
                 "для пользователя по userId {}.", userId, userId);
         return filmService.getRecommendations(userId);
     }
+
     @DeleteMapping("/{userId}")
     public void deleteUserById(@PathVariable int userId) {
         log.debug("Получен запрос Delete /users/{}. Удалить пользователя по userId {}.", userId, userId);
