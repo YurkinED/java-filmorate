@@ -238,12 +238,22 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
 
-    public List<Film> searchFilmByTitle(String query) {
-        String sqlQuery = "SELECT f.film_id, f.film_name, f.description, " +
-                "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-                "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
-                "ORDER BY rating DESC";
-        return null;
+    public List<Film> searchFilmsByTitle(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    public List<Film> searchFilmsByDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    public List<Film> searchFilmsByTitleAndDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
     }
 
 

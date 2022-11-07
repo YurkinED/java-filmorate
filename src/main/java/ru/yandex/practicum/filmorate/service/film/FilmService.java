@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -97,6 +98,14 @@ public class FilmService {
     }
 
     public List<Film> searchFilms(String query, List<String> by) {
-        return null;
+        if (by.contains("title") && by.contains("director")) {
+            return filmStorage.searchFilmsByTitleAndDirector(query);
+        } else if (by.contains("title") && by.size() == 1) {
+            return filmStorage.searchFilmsByTitle(query);
+        } else if (by.contains("director") && by.size() == 1){
+            return filmStorage.searchFilmsByDirector(query);
+        } else {
+            throw new BadSearchQueryException("Введен неверный поисковый запрос");
+        }
     }
 }

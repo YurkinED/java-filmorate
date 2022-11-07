@@ -108,5 +108,27 @@ public class SqlQueryConstantsForFilm {
                     "   JOIN (SELECT film_id " +
                     "         FROM likes where user_id=?) AS t2 on t1.film_id=t2.film_id " +
                     " ) ORDER BY likes_data.cnt DESC NULLS LAST";
+
+    public static final String SQL_QUERY_SEARCH_FILMS_BY_TITLE =
+            "SELECT f.film_id, f.film_name, f.description, " +
+                    "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    "WHERE LOWER(f.film_name) LIKE ? ORDER BY rating DESC";
+
+    public static final String SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR =
+            "SELECT f.film_id, f.film_name, f.description, " +
+                    "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    "INNER JOIN films_directors AS fd ON f.film_id = fd.film_id " +
+                    "INNER JOIN directors AS d ON fd.director_id = d.director_id " +
+                    "WHERE LOWER(d.director_name) LIKE ? ORDER BY rating DESC";
+
+    public static final String SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR =
+            "SELECT f.film_id, f.film_name, f.description, " +
+                    "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
+                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id " +
+                    "LEFT JOIN directors AS d ON fd.director_id = d.director_id " +
+                    "WHERE LOWER(d.director_name) LIKE ? OR LOWER(f.film_name) LIKE ? ORDER BY rating DESC";
 }
 
