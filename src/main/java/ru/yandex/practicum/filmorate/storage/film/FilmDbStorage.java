@@ -135,6 +135,19 @@ public class FilmDbStorage implements FilmStorage {
         return returnList;
     }
 
+    private Film makeFilm(SqlRowSet filmRows) {
+        int id = filmRows.getInt("film_id");
+        String name = filmRows.getString("film_name");
+        String description = filmRows.getString("description");
+        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
+        long duration = filmRows.getLong("duration");
+        int mpaId = filmRows.getInt("mpa_id");
+        String mpaName = filmRows.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(filmRows.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
+    }
+
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
@@ -153,18 +166,6 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
-    private Film makeFilm(SqlRowSet filmRows) {
-        int id = filmRows.getInt("film_id");
-        String name = filmRows.getString("film_name");
-        String description = filmRows.getString("description");
-        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
-        long duration = filmRows.getLong("duration");
-        int mpaId = filmRows.getInt("mpa_id");
-        String mpaName = filmRows.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(filmRows.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
-    }
 
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
@@ -214,6 +215,9 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+
+
+
     private MapSqlParameterSource getFilmParameters(Film film) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("film_name", film.getName());
@@ -244,4 +248,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setRating(rs.getInt("rating"));
         return addGenreAndDirectorToFilm(film);
     }
+
+
 }
