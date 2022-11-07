@@ -31,7 +31,6 @@ public class ReviewService {
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
         Review reviewForSave = reviewStorage.saveReview(review);
-        //userStorage.createFeed (review.getUserId(), review.getFilmId(), 2,2);
         userStorage.createFeed(reviewForSave.getUserId(), reviewForSave.getReviewId(), 2, 2);
         log.warn("Добавлена информация в ленту: пользователь id {} добавил отзыв к фильму {}",
                 review.getUserId(), review.getFilmId());
