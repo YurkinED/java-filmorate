@@ -14,6 +14,8 @@ import ru.yandex.practicum.filmorate.validators.FilmValidator;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
+
 @Slf4j
 @Service
 public class FilmService {
@@ -34,7 +36,7 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (!filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
-                userStorage.createFeed (userId, filmId,1,2);
+                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_ADD);
                 log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы уже поставили лайк ранее.");
@@ -49,7 +51,7 @@ public class FilmService {
                 && filmStorage.findFilmById(filmId).isPresent()) {
             if (filmStorage.checkLikeFilm(filmId, userId)) {
                 filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
-                userStorage.createFeed (userId, filmId,1,1);
+                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_REMOVE);
                 log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
             } else {
                 throw new LikesException("Вы еще не поставили лайк.");

@@ -14,6 +14,8 @@ import ru.yandex.practicum.filmorate.validators.ReviewValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class ReviewService {
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
         Review reviewForSave = reviewStorage.saveReview(review);
-        userStorage.createFeed(reviewForSave.getUserId(), reviewForSave.getReviewId(), 2, 2);
+        userStorage.createFeed(reviewForSave.getUserId(), reviewForSave.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_ADD);
         log.warn("Добавлена информация в ленту: пользователь id {} добавил отзыв к фильму {}",
                 review.getUserId(), review.getFilmId());
         return reviewForSave;
@@ -65,7 +67,7 @@ public class ReviewService {
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
         Review updateReview = reviewStorage.updateReview(review);
-        userStorage.createFeed(updateReview.getUserId(), updateReview.getReviewId(), 2, 3);
+        userStorage.createFeed(updateReview.getUserId(), updateReview.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_UPDATE);
         log.warn("Добавлена информация в ленту: пользователь id {} обновил отзыв к фильму {}",
                 updateReview.getUserId(), updateReview.getFilmId());
         return updateReview;
@@ -74,7 +76,7 @@ public class ReviewService {
     public void deleteReviewById(Integer id) {
         Review checkReview = findReviewById(id);
         reviewStorage.deleteReviewById(id);
-        userStorage.createFeed(checkReview.getUserId(), checkReview.getFilmId(), 2, 1);
+        userStorage.createFeed(checkReview.getUserId(), checkReview.getFilmId(), EVENT_TYPE_REVIEW, OPERATION_REMOVE);
         log.warn("Добавлена информация в ленту: пользователь id {} удалил отзыв к фильму {}",
                 checkReview.getUserId(), checkReview.getFilmId());
     }
