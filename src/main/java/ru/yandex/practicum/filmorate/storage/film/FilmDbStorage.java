@@ -139,19 +139,15 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
 
-    public List<Film> showMostLikedFilmsByYearAndGenre(Optional<Integer> limit, Optional<Integer> genreId,
-                                                       Optional<String> year, String query) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
         ArrayList<Film> films = new ArrayList<>();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
 
-        if (limit.isPresent())
-            parameters.addValue("limit", limit.get());
-        if (genreId.isPresent())
-            parameters.addValue("genre_id", genreId.get());
-        if (year.isPresent())
-            parameters.addValue("year", year.get());
-
-        SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(query, parameters);
+        parameters.addValue("genre_id", genreId);
+        parameters.addValue("year", year);
+        parameters.addValue("limit", limit);
+        System.out.println(SQL_QUERY_FIND_FILM_FILTER);
+        SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_FIND_FILM_FILTER, parameters);
         while (filmRows.next()) {
             films.add(makeFilm(filmRows));
         }

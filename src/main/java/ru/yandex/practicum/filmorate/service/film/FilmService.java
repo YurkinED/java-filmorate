@@ -93,8 +93,8 @@ public class FilmService {
         filmStorage.deleteFilmById(filmId);
     }
 
-    public List<Film> showMostLikedFilmsByYearAndGenre(Optional<Integer> limit, Optional<Integer> genreId,
-                                                       Optional<String> year, String query) {
-        return filmStorage.showMostLikedFilmsByYearAndGenre(limit, genreId, year, query);
+
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+        return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
     }
 }

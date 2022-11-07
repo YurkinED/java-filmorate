@@ -39,38 +39,14 @@ public class FilmController {
                 () -> new InvalidIdException("К сожалению, фильма с id " + filmId + " нет."));
     }
 
-    @GetMapping(value = {"/popular", "/popular?count={limit}",
-            "/popular?count={limit}&genreId={genreId}&year={year}"})
-    public List<Film> showMostLikedFilms(@RequestParam(name = "count") Optional<Integer> limit,
-                                         @RequestParam(name = "genreId") Optional<Integer> genreId,
-                                         @RequestParam(name = "year") Optional<String> year) {
+    @GetMapping(value = {"/popular"})
+    public List<Film> showMostLikedFilms(@RequestParam(name = "count", required = false, defaultValue = "10") Integer limit,
+                                         @RequestParam(name = "genreId", required = false, defaultValue = "0") Integer genreId,
+                                         @RequestParam(name = "year",  required = false, defaultValue = "0") String year) {
 
-        if (genreId.isPresent() && year.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?genreId={}&year={}. Показать топ фильмов по лайкам " +
-                    "с id жанра {} за {} год.", genreId.get(), year.get(), genreId.get(), year.get());
-            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
-                    SQL_QUERY_FIND_FILM_BY_GENRE_YEAR_AND_SORT_BY_RATING);
-
-        } else if (genreId.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?genreId={}. Показать топ фильмов по лайкам с id жанра {}.",
-                    genreId.get(), genreId.get());
-            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
-                    SQL_QUERY_FIND_FILM_BY_GENRE_AND_SORT_BY_RATING);
-
-        } else if (year.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?year={}. Показать топ фильмов по лайкам с за {} год.",
-                    year.get(), year.get());
-            return filmService.showMostLikedFilmsByYearAndGenre(limit, genreId, year,
-                    SQL_QUERY_FIND_FILM_BY_YEAR_AND_SORT_BY_RATING);
-
-        } else if (limit.isPresent()) {
-            log.debug("Получен запрос GET /films/popular?count={}. Показать топ {} фильмов по лайкам.", limit, limit);
-            return filmService.showMostLikedFilms(limit.get());
-
-        } else {
-            log.debug("Получен запрос GET /films/popular. Показать топ 10 фильмов по лайкам.");
-            return filmService.showMostLikedFilms(10);
-        }
+        log.debug("Получен запрос GET /films/popular?count={}, genreId={}&year={}. Показать топ фильмов по лайкам " +
+                "с id жанра {} за {} год.",limit, genreId, year);
+        return filmService.showMostLikedFilmsFilter(limit, genreId, year);
     }
 
 
