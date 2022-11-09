@@ -88,7 +88,7 @@ CREATE TABLE reviews_likes
 (
     review_id int REFERENCES reviews (review_id) ON DELETE CASCADE,
     user_id   int REFERENCES users (user_id) ON DELETE CASCADE,
-    isLike    boolean NOT NULL
+    useful    int NOT NULL
 );
 
 CREATE TABLE directors

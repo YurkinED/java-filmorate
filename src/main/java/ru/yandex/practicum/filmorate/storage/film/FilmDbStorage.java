@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,6 +23,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 
 @Slf4j
 @Component
+@Primary
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DirectorService directorService;
@@ -59,6 +61,7 @@ public class FilmDbStorage implements FilmStorage {
         return installFilmGenresAndDirectors(film);
     }
 
+    @Override
     public Optional<Film> findFilmById(int filmId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID,
@@ -81,6 +84,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
     public boolean checkLikeFilm(int filmId, int userId) {
         SqlRowSet likeRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_CHECK_LIKE, filmId, userId);
@@ -93,6 +97,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
     public void likeFilmOrRemoveLike(int filmId, int userId, boolean flag) {
         MapSqlParameterSource parameters = getLikeParameters(filmId, userId);
         if (flag) {
@@ -102,6 +107,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
     public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
         directorService.findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
@@ -115,6 +121,7 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
     public List<Film> commonLikedFilms(int userId, int friendId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_COMMON_FILMS, userId, friendId);
@@ -148,10 +155,12 @@ public class FilmDbStorage implements FilmStorage {
         return addGenreAndDirectorToFilm(film);
     }
 
+    @Override
     public void deleteFilmById(int filmId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILM_BY_ID, filmId);
     }
 
+    @Override
     public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
         ArrayList<Film> films = new ArrayList<>();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -235,6 +244,7 @@ public class FilmDbStorage implements FilmStorage {
         return parameters;
     }
 
+    @Override
     public Collection<Film> getRecommendations(int userId) {
         return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
                 SQL_QUERY_TAKE_RECOMMENDED_FILMS,
@@ -256,18 +266,21 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
+    @Override
     public List<Film> searchFilmsByTitle(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
                 query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
     }
 
+    @Override
     public List<Film> searchFilmsByDirector(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
                 query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
     }
 
+    @Override
     public List<Film> searchFilmsByTitleAndDirector(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().

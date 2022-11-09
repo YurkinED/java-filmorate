@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.reviewExceptions.LikeOrDislikeReviewException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
-import ru.yandex.practicum.filmorate.validators.ReviewValidator;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +20,10 @@ import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewStorage reviewStorage;
-    private final ReviewValidator reviewValidator;
-    private final FilmDbStorage filmStorage;
-    private final UserDbStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Review createReview(Review review) {
-        reviewValidator.validate(review);
         log.debug("Валидация объекта review в методе createReview прошла успешно");
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(() ->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
@@ -61,7 +58,6 @@ public class ReviewService {
 
     public Review updateReview(Review review) {
         findReviewById(review.getReviewId());
-        reviewValidator.validate(review);
         filmStorage.findFilmById(review.getFilmId()).orElseThrow(() ->
                 new InvalidIdException("Фильм с id" + review.getFilmId() + " не найден"));
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
@@ -89,25 +85,13 @@ public class ReviewService {
             throw new LikeOrDislikeReviewException("Пользователь с id" + userId + " уже поставил оценку этому отзыву");
         }
         reviewStorage.addLikeOrDislikeToReview(id, userId, isLike);
-        if (isLike) {
-            review.setUseful(review.getUseful() + 1);
-        } else {
-            review.setUseful(review.getUseful() - 1);
-        }
-        reviewStorage.updateUsefulInReview(review);
     }
 
-    public void deleteLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {
+    public void deleteLikeOrDislikeToReview(Integer id, Integer userId) {
         Review review = findReviewById(id);
         if (!reviewStorage.containsLikeOrDislike(id, userId)) {
             throw new LikeOrDislikeReviewException("Оценка отзыва для пользователя с id" + userId + " не найдена");
         }
         reviewStorage.deleteLikeOrDislikeToReview(id, userId);
-        if (isLike) {
-            review.setUseful(review.getUseful() - 1);
-        } else {
-            review.setUseful(review.getUseful() + 1);
-        }
-        reviewStorage.updateUsefulInReview(review);
     }
 }

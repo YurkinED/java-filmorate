@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Review;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForReview.*;
 
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class ReviewDBStorage implements ReviewStorage {
 
@@ -67,13 +67,6 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public Review updateUsefulInReview(Review review) {
-        MapSqlParameterSource parameters = getReviewParameters(review);
-        namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_USEFUL, parameters);
-        return review;
-    }
-
-    @Override
     public void deleteReviewById(Integer id) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_REVIEW_BY_ID, id);
     }
@@ -86,12 +79,19 @@ public class ReviewDBStorage implements ReviewStorage {
 
     @Override
     public void addLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_ADD_LIKE_OR_DISLIKE, id, userId, isLike);
+        int useful = isLike ? 1 : -1;
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_ADD_LIKE_OR_DISLIKE, id, userId, useful);
+        updateUsefulInReview(id);
     }
 
     @Override
     public void deleteLikeOrDislikeToReview(Integer id, Integer userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_LIKE_OR_DISLIKE, id, userId);
+        updateUsefulInReview(id);
+    }
+
+    private void updateUsefulInReview(Integer id) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_UPDATE_USEFUL, id);
     }
 
     private MapSqlParameterSource getReviewParameters(Review review) {
