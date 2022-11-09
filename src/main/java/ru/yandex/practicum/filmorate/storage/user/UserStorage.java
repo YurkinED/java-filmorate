@@ -15,6 +15,6 @@ public interface UserStorage {
 
     Optional<User> findUserById(int userId);
 
-    void createFeed(int userId, int entityId, int eventType, int operation);
+    /*void createFeed(int userId, int entityId, int eventType, int operation);*/
 
 }

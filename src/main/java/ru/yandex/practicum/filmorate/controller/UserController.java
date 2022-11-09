@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -20,10 +21,13 @@ public class UserController {
     private final UserService userService;
     private final FilmService filmService;
 
+    private final FeedService feedService;
+
     @Autowired
-    public UserController(UserService userService, FilmService filmService) {
+    public UserController(UserService userService, FilmService filmService, FeedService feedService) {
         this.userService = userService;
         this.filmService = filmService;
+        this.feedService = feedService;
     }
 
     @GetMapping
@@ -86,7 +90,7 @@ public class UserController {
                 id, id);
         userService.findUserById(id).orElseThrow(
                 () -> new InvalidIdException("К сожалению, пользователя с id " + id + " нет."));
-        return userService.showUsersFeeds(id);
+        return feedService.showUsersFeeds(id);
     }
 
     @GetMapping("/{userId}/recommendations")

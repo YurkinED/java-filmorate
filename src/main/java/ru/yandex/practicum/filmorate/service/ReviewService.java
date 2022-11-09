@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.reviewExceptions.LikeOrDislikeReviewException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -22,6 +23,7 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FeedStorage feedStorage;
 
     public Review createReview(Review review) {
         log.debug("Валидация объекта review в методе createReview прошла успешно");
@@ -30,7 +32,7 @@ public class ReviewService {
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
         Review reviewForSave = reviewStorage.saveReview(review);
-        userStorage.createFeed(reviewForSave.getUserId(), reviewForSave.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_ADD);
+        feedStorage.createFeed(reviewForSave.getUserId(), reviewForSave.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_ADD);
         log.warn("Добавлена информация в ленту: пользователь id {} добавил отзыв к фильму {}",
                 review.getUserId(), review.getFilmId());
         return reviewForSave;
@@ -63,7 +65,7 @@ public class ReviewService {
         userStorage.findUserById(review.getUserId()).orElseThrow(() ->
                 new InvalidIdException("Пользователь с id" + review.getUserId() + " не найден"));
         Review updateReview = reviewStorage.updateReview(review);
-        userStorage.createFeed(updateReview.getUserId(), updateReview.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_UPDATE);
+        feedStorage.createFeed(updateReview.getUserId(), updateReview.getReviewId(), EVENT_TYPE_REVIEW, OPERATION_UPDATE);
         log.warn("Добавлена информация в ленту: пользователь id {} обновил отзыв к фильму {}",
                 updateReview.getUserId(), updateReview.getFilmId());
         return updateReview;
@@ -72,7 +74,7 @@ public class ReviewService {
     public void deleteReviewById(Integer id) {
         Review checkReview = findReviewById(id);
         reviewStorage.deleteReviewById(id);
-        userStorage.createFeed(checkReview.getUserId(), checkReview.getFilmId(), EVENT_TYPE_REVIEW, OPERATION_REMOVE);
+        feedStorage.createFeed(checkReview.getUserId(), checkReview.getFilmId(), EVENT_TYPE_REVIEW, OPERATION_REMOVE);
         log.warn("Добавлена информация в ленту: пользователь id {} удалил отзыв к фильму {}",
                 checkReview.getUserId(), checkReview.getFilmId());
     }

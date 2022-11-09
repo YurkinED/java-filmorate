@@ -191,7 +191,7 @@ public class UserDbStorage implements UserStorage {
         return parameters;
     }
 
-    public Collection<Feed> showUsersFeeds(int id) {
+    /*public Collection<Feed> showUsersFeeds(int id) {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
                 (rs, rowNum) -> makeFeed(id, rs), id);
     }
@@ -216,7 +216,7 @@ public class UserDbStorage implements UserStorage {
                 operation,
                 entityId,
                 Timestamp.valueOf(now).getTime());
-    }
+    }*/
 
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);

@@ -38,11 +38,6 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.ofNullable(users.get(userId));
     }
 
-    @Override
-    public void createFeed(int userId, int entityId, int eventType, int operation) {
-
-    }
-
     public User createUser(@Valid User user) {
         log.debug("Получен запрос POST /users.");
         userValidator.validator(user);

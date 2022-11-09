@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
@@ -21,43 +22,43 @@ import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 public class FilmService {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
+
+    private final FeedStorage feedStorage;
     private final FilmValidator filmValidator;
 
     @Autowired
-    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, FilmValidator filmValidator) {
+    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, FilmValidator filmValidator, FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.filmValidator = filmValidator;
+        this.feedStorage = feedStorage;
     }
 
-
     public void addLikeToFilm(int filmId, int userId) {
-        if (userStorage.findUserById(userId).isPresent()
-                && filmStorage.findFilmById(filmId).isPresent()) {
-            if (!filmStorage.checkLikeFilm(filmId, userId)) {
-                filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
-                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_ADD);
-                log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
-            } else {
-                throw new LikesException("Вы уже поставили лайк ранее.");
-            }
+        userStorage.findUserById(userId).orElseThrow(
+                () -> new InvalidIdException("Пользователь с id" + userId + " не найден"));
+        filmStorage.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
+        if (!filmStorage.checkLikeFilm(filmId, userId)) {
+            filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
+            feedStorage.createFeed(userId, filmId, EVENT_TYPE_LIKE, OPERATION_ADD);
+            log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
         } else {
-            throw new InvalidIdException("Неверно введен id пользователя или фильма.");
+            throw new LikesException("Вы уже поставили лайк ранее.");
         }
     }
 
     public void removeLikeFromFilm(int filmId, int userId) {
-        if (userStorage.findUserById(userId).isPresent()
-                && filmStorage.findFilmById(filmId).isPresent()) {
-            if (filmStorage.checkLikeFilm(filmId, userId)) {
-                filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
-                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_REMOVE);
-                log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
-            } else {
-                throw new LikesException("Вы еще не поставили лайк.");
-            }
+        userStorage.findUserById(userId).orElseThrow(
+                () -> new InvalidIdException("Пользователь с id" + userId + " не найден"));
+        filmStorage.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
+        if (filmStorage.checkLikeFilm(filmId, userId)) {
+            filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
+            feedStorage.createFeed(userId, filmId, EVENT_TYPE_LIKE, OPERATION_REMOVE);
+            log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
         } else {
-            throw new InvalidIdException("Неверно введен id пользователя или фильма.");
+            throw new LikesException("Вы еще не поставили лайк.");
         }
     }
 
@@ -111,6 +112,5 @@ public class FilmService {
         } else {
             throw new BadSearchQueryException("Введен неверный поисковый запрос");
         }
-
     }
 }

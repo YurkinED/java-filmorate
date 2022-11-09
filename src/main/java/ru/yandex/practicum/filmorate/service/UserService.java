@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -18,12 +19,13 @@ import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 public class UserService {
     private final UserDbStorage userDbStorage;
     private final UserValidator userValidator;
-
+    private final FeedStorage feedStorage;
 
     @Autowired
-    public UserService(UserDbStorage userDbStorage, UserValidator userValidator) {
+    public UserService(UserDbStorage userDbStorage, UserValidator userValidator, FeedStorage feedStorage) {
         this.userDbStorage = userDbStorage;
         this.userValidator = userValidator;
+        this.feedStorage = feedStorage;
     }
 
     public void addToFriends(int userId, int friendId) {
@@ -34,7 +36,7 @@ public class UserService {
             if (!userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.addToFriend(userId, friendId);
                 log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
-                createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_ADD);
+                feedStorage.createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_ADD);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} стали друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} уже друзья", userId, friendId);
@@ -54,7 +56,7 @@ public class UserService {
             if (userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.removeFromFriends(userId, friendId);
                 log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
-                createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_REMOVE);
+                feedStorage.createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_REMOVE);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} перестали быть друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} не друзья ", userId, friendId);
@@ -94,13 +96,5 @@ public class UserService {
 
     public void deleteUserById(int userId) {
         userDbStorage.deleteUserById(userId);
-    }
-
-    public Collection<Feed> showUsersFeeds(int id) {
-        return userDbStorage.showUsersFeeds(id);
-    }
-
-    public void createFeed (int userId, int entityId, int eventType, int operation){
-        userDbStorage.createFeed(userId, entityId, eventType, operation);
     }
 }
