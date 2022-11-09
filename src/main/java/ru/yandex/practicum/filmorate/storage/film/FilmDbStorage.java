@@ -175,6 +175,47 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public List<Film> getRecommendations(int userId) {
+        return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
+                SQL_QUERY_TAKE_RECOMMENDED_FILMS,
+                (rowSet, rowNum) -> makeFilmFromRs(rowSet),
+                userId, userId, userId));
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitle(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    @Override
+    public List<Film> searchFilmsByDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitleAndDirector(String query) {
+        String queryParam = "%" + query.toLowerCase() + "%";
+        return namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
+    }
+
+    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
+        int id = rs.getInt("film_id");
+        String name = rs.getString("film_name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration");
+        int mpaId = rs.getInt("mpa_id");
+        String mpaName = rs.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(rs.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
+    }
 
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
@@ -224,9 +265,6 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-
-
-
     private MapSqlParameterSource getFilmParameters(Film film) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("film_name", film.getName());
@@ -242,49 +280,6 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("film_id", filmId);
         parameters.addValue("user_id", userId);
         return parameters;
-    }
-
-    @Override
-    public Collection<Film> getRecommendations(int userId) {
-        return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
-                SQL_QUERY_TAKE_RECOMMENDED_FILMS,
-                (rowSet, rowNum) -> makeFilmFromRs(rowSet),
-                userId, userId, userId));
-    }
-
-    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("film_name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration");
-        int mpaId = rs.getInt("mpa_id");
-        String mpaName = rs.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(rs.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
-
-    }
-
-    @Override
-    public List<Film> searchFilmsByTitle(String query) {
-        String queryParam = "%" + query.toLowerCase() + "%";
-        return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
-    }
-
-    @Override
-    public List<Film> searchFilmsByDirector(String query) {
-        String queryParam = "%" + query.toLowerCase() + "%";
-        return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
-    }
-
-    @Override
-    public List<Film> searchFilmsByTitleAndDirector(String query) {
-        String queryParam = "%" + query.toLowerCase() + "%";
-        return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
     }
 
 

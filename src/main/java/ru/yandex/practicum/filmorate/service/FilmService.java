@@ -81,7 +81,7 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public Collection<Film> getRecommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         return filmStorage.getRecommendations(userId);
     }
 
