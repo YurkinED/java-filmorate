@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
     Collection<Film> findAllFilms();
@@ -11,5 +12,7 @@ public interface FilmStorage {
     Film createFilm(@Valid Film film);
 
     Film updateFilm(@Valid Film film);
+
+    Optional<Film> findFilmById(int filmId);
 
 }

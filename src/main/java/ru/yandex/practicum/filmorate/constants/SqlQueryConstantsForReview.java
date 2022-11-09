@@ -24,7 +24,7 @@ public class SqlQueryConstantsForReview {
             "SELECT * FROM reviews_likes WHERE review_id = ? AND user_id = ?";
 
     public static final String SQL_QUERY_ADD_LIKE_OR_DISLIKE =
-            "INSERT INTO reviews_likes (review_id, user_id, isLike) " +
+            "INSERT INTO reviews_likes (review_id, user_id, useful) " +
                     "VALUES (?, ?, ?)";
 
     public static final String SQL_QUERY_DELETE_LIKE_OR_DISLIKE =
@@ -32,6 +32,7 @@ public class SqlQueryConstantsForReview {
                     "WHERE review_id = ? AND user_id = ?";
 
     public static final String SQL_QUERY_UPDATE_USEFUL =
-            "UPDATE reviews SET useful = :useful " +
-                    "WHERE review_id = :review_id";
+            "UPDATE REVIEWS r set r.useful = (select sum(l.useful) from REVIEWS_LIKES l where l.review_id = r.review_id) " +
+                    "where r.review_id = ?";
+
 }

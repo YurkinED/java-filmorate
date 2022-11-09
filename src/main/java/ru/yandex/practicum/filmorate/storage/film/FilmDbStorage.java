@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,6 +23,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 
 @Slf4j
 @Component
+@Primary
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DirectorService directorService;
@@ -59,6 +61,7 @@ public class FilmDbStorage implements FilmStorage {
         return installFilmGenresAndDirectors(film);
     }
 
+    @Override
     public Optional<Film> findFilmById(int filmId) {
         SqlRowSet filmRows =
                 namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID,

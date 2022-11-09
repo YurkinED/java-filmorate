@@ -32,8 +32,6 @@ public class ErrorHandler {
     @ExceptionHandler({InvalidNameException.class, LongDescriptionException.class, NegativeDurationException.class,
             ReleaseDateException.class, InvalidBirthDateException.class, InvalidEmailException.class,
             InvalidLoginException.class, UserAlreadyExistException.class,
-            EmptyContentReviewException.class, InvalidFilmReviewException.class,
-            InvalidIsPositiveReviewException.class, InvalidUserReviewException.class,
             LikeOrDislikeReviewException.class, BadSearchQueryException.class,
             MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

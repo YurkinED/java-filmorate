@@ -2,22 +2,27 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.validators.ValidationGroup;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    Review createReview(@RequestBody Review review) {
+    @Validated({ValidationGroup.OnCreate.class})
+    Review createReview(@Valid @RequestBody Review review) {
         log.debug("Получен запрос POST /reviews. Создать отзыв {}", review);
         return reviewService.createReview(review);
     }
@@ -42,7 +47,8 @@ public class ReviewController {
     }
 
     @PutMapping
-    Review updateReview(@RequestBody Review review) {
+    @Validated({ValidationGroup.OnUpdate.class})
+    Review updateReview(@Valid @RequestBody Review review) {
         log.debug("Получен запрос PUT /reviews. Обновить данные отзыва {}", review);
         return reviewService.updateReview(review);
     }
@@ -71,13 +77,13 @@ public class ReviewController {
     void deleteLikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
         log.debug("Получен запрос DELETE /reviews/{}/like/{}. " +
                 "Удалить лайк у отзыва с id{} от пользователя с id{}", id, userId, id, userId);
-        reviewService.deleteLikeOrDislikeToReview(id, userId, Boolean.TRUE);
+        reviewService.deleteLikeOrDislikeToReview(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     void deleteDislikeToReview(@PathVariable Integer id, @PathVariable Integer userId) {
         log.debug("Получен запрос DELETE /reviews/{}/dislike/{}. " +
                 "Удалить дизлайк у отзыва с id{} от пользователя с id{}", id, userId, id, userId);
-        reviewService.deleteLikeOrDislikeToReview(id, userId, Boolean.FALSE);
+        reviewService.deleteLikeOrDislikeToReview(id, userId);
     }
 }

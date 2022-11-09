@@ -11,7 +11,6 @@ public interface ReviewStorage {
     List<Review> findReviewByFilmId(Integer filmId);
     Optional<Review> findReviewById(Integer id);
     Review updateReview(Review review);
-    Review updateUsefulInReview(Review review);
     void deleteReviewById(Integer id);
     boolean containsLikeOrDislike(Integer id, Integer userId);
     void addLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike);
