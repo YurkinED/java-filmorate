@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -16,10 +15,11 @@ import java.util.*;
 @Deprecated
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
-    @Autowired
+
     private final FilmValidator filmValidator;
     private int id;
 
+    @Autowired
     public InMemoryFilmStorage(FilmValidator filmValidator) {
         this.filmValidator = filmValidator;
     }
@@ -65,7 +65,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getRecommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         return null;
     }
 

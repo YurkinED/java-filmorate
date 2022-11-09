@@ -28,7 +28,7 @@ public interface FilmStorage {
 
     List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year);
 
-    Collection<Film> getRecommendations(int userId);
+    List<Film> getRecommendations(int userId);
 
     List<Film> searchFilmsByTitle(String query);
 

@@ -3,38 +3,38 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @Service
 public class DirectorService {
-    private final DirectorDbStorage directorDbStorage;
+    private final DirectorStorage directorStorage;
 
     @Autowired
-    public DirectorService(DirectorDbStorage directorDbStorage) {
-        this.directorDbStorage = directorDbStorage;
+    public DirectorService(DirectorStorage directorStorage) {
+        this.directorStorage = directorStorage;
     }
 
     public Collection<Director> findAllDirectors() {
-        return directorDbStorage.findAllDirectors();
+        return directorStorage.findAllDirectors();
     }
 
     public Optional<Director> findDirectorById(int genreId) {
-        return directorDbStorage.findDirectorById(genreId);
+        return directorStorage.findDirectorById(genreId);
     }
 
     public Director createDirector(Director director) {
-        return directorDbStorage.createDirector(director);
+        return directorStorage.createDirector(director);
     }
 
     public Director updateDirector(Director director) {
-        return directorDbStorage.updateDirector(director);
+        return directorStorage.updateDirector(director);
     }
 
     public void removeDirector(int directorId) {
-        directorDbStorage.removeDirector(directorId);
+        directorStorage.removeDirector(directorId);
     }
 
 }
