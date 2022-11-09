@@ -35,7 +35,7 @@ public class DirectorDbStorage implements DirectorInterface {
     }
 
     @Override
-    public Optional<Director> findDirectorById(int directorId) {
+    public Optional<Director> findDirectorById(long directorId) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_DIRECTOR_BY_ID, directorId);
         if (genreRows.next()) {
@@ -61,7 +61,7 @@ public class DirectorDbStorage implements DirectorInterface {
 
     @Override
     public Director updateDirector(Director director) {
-        int directorId = director.getId();
+        long directorId = director.getId();
         findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет фильма с id " + director));
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -71,7 +71,7 @@ public class DirectorDbStorage implements DirectorInterface {
     }
 
     @Override
-    public void removeDirector(int directorId) {
+    public void removeDirector(long directorId) {
         findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         MapSqlParameterSource parameters = new MapSqlParameterSource();

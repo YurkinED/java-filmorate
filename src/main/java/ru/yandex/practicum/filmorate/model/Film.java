@@ -27,9 +27,9 @@ public class Film {
     @NotNull
     private BaseEntity mpa;
 
-    private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
+    private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingLong(BaseEntity::getId));
 
-    private Set<Director> directors = new TreeSet<>(Comparator.comparingInt(Director::getId));
+    private Set<Director> directors = new TreeSet<>(Comparator.comparingLong(Director::getId));
 
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;

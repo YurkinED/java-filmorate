@@ -202,7 +202,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<BaseEntity> genres = film.getGenres();
         if (genres.size() > 0) {
             for (BaseEntity element : film.getGenres()) {
-                int genreId = element.getId();
+                long genreId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("genre_id", genreId);
@@ -214,7 +214,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
             for (Director element : film.getDirectors()) {
-                int directorId = element.getId();
+                long directorId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("director_id", directorId);

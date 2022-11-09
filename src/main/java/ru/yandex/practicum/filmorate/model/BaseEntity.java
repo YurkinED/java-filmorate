@@ -7,5 +7,5 @@ import lombok.*;
 @Data
 @EqualsAndHashCode
 public class BaseEntity {
-    private int id;
+    private long id;
 }

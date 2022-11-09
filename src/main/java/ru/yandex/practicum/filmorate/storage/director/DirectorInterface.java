@@ -9,12 +9,12 @@ public interface DirectorInterface {
 
     Collection<Director> findAllDirectors();
 
-    Optional<Director> findDirectorById(int directorId);
+    Optional<Director> findDirectorById(long directorId);
 
     Director createDirector(Director director);
 
     Director updateDirector(Director director);
 
-    void removeDirector(int directorId);
+    void removeDirector(long directorId);
 
 }
