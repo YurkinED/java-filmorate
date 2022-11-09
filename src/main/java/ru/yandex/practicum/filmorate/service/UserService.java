@@ -36,7 +36,7 @@ public class UserService {
             if (!userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.addToFriend(userId, friendId);
                 log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
-                feedStorage.createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_ADD);
+                feedStorage.createFeed (userId, friendId, Feed.Event.FRIEND,Feed.Operation.ADD);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} стали друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} уже друзья", userId, friendId);
@@ -56,7 +56,7 @@ public class UserService {
             if (userDbStorage.checkFriendshipExists(userId, friendId)) {
                 userDbStorage.removeFromFriends(userId, friendId);
                 log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
-                feedStorage.createFeed (userId, friendId,EVENT_TYPE_FRIEND,OPERATION_REMOVE);
+                feedStorage.createFeed (userId, friendId,Feed.Event.FRIEND,Feed.Operation.REMOVE);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} перестали быть друзьями", userId, friendId);
             } else {
                 log.warn("Пользователь {} и {} не друзья ", userId, friendId);

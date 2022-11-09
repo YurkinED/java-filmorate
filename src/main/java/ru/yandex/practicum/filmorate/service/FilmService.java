@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -41,7 +42,7 @@ public class FilmService {
                 () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
         if (!filmStorage.checkLikeFilm(filmId, userId)) {
             filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
-            feedStorage.createFeed(userId, filmId, EVENT_TYPE_LIKE, OPERATION_ADD);
+            feedStorage.createFeed(userId, filmId, Feed.Event.LIKE, Feed.Operation.ADD);
             log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
         } else {
             throw new LikesException("Вы уже поставили лайк ранее.");
@@ -55,7 +56,7 @@ public class FilmService {
                 () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
         if (filmStorage.checkLikeFilm(filmId, userId)) {
             filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
-            feedStorage.createFeed(userId, filmId, EVENT_TYPE_LIKE, OPERATION_REMOVE);
+            feedStorage.createFeed(userId, filmId, Feed.Event.LIKE, Feed.Operation.REMOVE);
             log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
         } else {
             throw new LikesException("Вы еще не поставили лайк.");

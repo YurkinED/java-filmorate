@@ -21,7 +21,6 @@ public class FeedDbStorage implements FeedStorage {
     @Autowired
     public FeedDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-
     }
     @Override
     public Collection<Feed> showUsersFeeds(int id) {
@@ -30,14 +29,14 @@ public class FeedDbStorage implements FeedStorage {
     }
 
     @Override
-    public void createFeed(int userId, int entityId, int eventType, int operation) {
+    public void createFeed(int userId, int entityId, Feed.Event eventType, Feed.Operation operation) {
         LocalDateTime now = LocalDateTime.now();
         String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +
                 "values (?, ?, ?, ?, ?)";
         namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery,
                 userId,
-                eventType,
-                operation,
+                eventType.name(),
+                operation.name(),
                 entityId,
                 Timestamp.valueOf(now).getTime());
     }
@@ -46,8 +45,8 @@ public class FeedDbStorage implements FeedStorage {
         return new Feed(rs.getInt("feed_id"),
                 id,
                 rs.getInt("entity_id"),
-                rs.getString("event_type_name"),
-                rs.getString("operation_name"),
+                Feed.Event.valueOf(rs.getString("event_type")),
+                Feed.Operation.valueOf(rs.getString("operation")),
                 rs.getLong("creation_time"));
     }
 }
