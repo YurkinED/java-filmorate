@@ -11,7 +11,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,12 +26,12 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @Primary
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final DirectorService directorService;
+    private final DirectorStorage directorStorage;
 
     @Autowired
-    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorService directorService) {
+    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorStorage directorStorage) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.directorService = directorService;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
-        directorService.findDirectorById(directorId)
+        directorStorage.findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         ArrayList<Film> films = new ArrayList<>();
         SqlRowSet filmRows =
