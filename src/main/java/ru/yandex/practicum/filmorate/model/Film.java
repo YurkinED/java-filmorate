@@ -25,7 +25,7 @@ public class Film {
     @Min(1)
     private long duration;
     @NotNull
-    private BaseEntity mpa;
+    private Mpa mpa;
 
     private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
 
@@ -34,7 +34,7 @@ public class Film {
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;
 
-   public Film(int id, String name, String description, LocalDate releaseDate, long duration, BaseEntity mpa) {
+   public Film(int id, String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
