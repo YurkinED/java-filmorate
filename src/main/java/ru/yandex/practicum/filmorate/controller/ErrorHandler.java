@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,18 +15,28 @@ import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginExcep
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
+@Slf4j
 @RestControllerAdvice("ru.yandex.practicum.filmorate.controller")
 public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleSystemExceptions(final IllegalArgumentException e) {
+        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleSystemExceptions(final NullPointerException e) {
+        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleSystemExceptions(final Throwable e) {
+        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
@@ -36,12 +47,14 @@ public class ErrorHandler {
             MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateParameterException(final RuntimeException e) {
+        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler({LikesException.class, InvalidIdException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleSystemExceptions(final RuntimeException e) {
+        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }
