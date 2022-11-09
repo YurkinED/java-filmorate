@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,6 +15,8 @@ import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidEmailExcep
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.InvalidLoginException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
+
+import javax.validation.ConstraintViolationException;
 
 @Slf4j
 @RestControllerAdvice("ru.yandex.practicum.filmorate.controller")
@@ -38,6 +41,11 @@ public class ErrorHandler {
     public ErrorResponse handleSystemExceptions(final Throwable e) {
         log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity< String > exc(ConstraintViolationException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({InvalidNameException.class, LongDescriptionException.class, NegativeDurationException.class,
