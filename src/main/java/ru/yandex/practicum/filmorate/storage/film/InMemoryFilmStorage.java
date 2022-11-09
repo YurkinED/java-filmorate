@@ -34,6 +34,56 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public boolean checkLikeFilm(int filmId, int userId) {
+        return false;
+    }
+
+    @Override
+    public void likeFilmOrRemoveLike(int filmId, int userId, boolean flag) {
+
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> commonLikedFilms(int userId, int friendId) {
+        return null;
+    }
+
+    @Override
+    public void deleteFilmById(int filmId) {
+
+    }
+
+    @Override
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+        return null;
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(int userId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitle(String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmsByDirector(String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitleAndDirector(String query) {
+        return null;
+    }
+
+    @Override
     public Film createFilm(@Valid Film film) {
         log.debug("Получен запрос POST /films.");
         filmValidator.validator(film);

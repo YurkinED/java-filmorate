@@ -143,12 +143,12 @@ CREATE TABLE IF NOT EXISTS reviews_likes
 (
     review_id int REFERENCES reviews (review_id) ON DELETE CASCADE,
     user_id   int REFERENCES users (user_id) ON DELETE CASCADE,
-    isLike    boolean NOT NULL,
+    useful    int NOT NULL,
     PRIMARY KEY (review_id, user_id)
 );
 
 COMMENT ON TABLE reviews_likes IS 'Список лайков на отзыв';
-COMMENT ON COLUMN reviews_likes.isLike IS 'Является ли лайком или дизлайком';
+COMMENT ON COLUMN reviews_likes.useful IS 'Является ли лайком или дизлайком';
 
 CREATE TABLE IF NOT EXISTS  directors
 (

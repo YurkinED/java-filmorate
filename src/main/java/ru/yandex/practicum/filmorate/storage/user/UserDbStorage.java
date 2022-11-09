@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,6 +26,7 @@ import static org.junit.platform.commons.util.StringUtils.isBlank;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*;
 
 @Slf4j
+@Primary
 @Repository
 public class UserDbStorage implements UserStorage {
 
@@ -202,6 +204,7 @@ public class UserDbStorage implements UserStorage {
                 rs.getLong("creation_time"));
     }
 
+    @Override
     public void createFeed(int userId, int entityId, int eventType, int operation) {
         LocalDateTime now = LocalDateTime.now();
         String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +

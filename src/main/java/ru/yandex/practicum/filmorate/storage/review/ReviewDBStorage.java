@@ -67,13 +67,6 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public Review updateUsefulInReview(Review review) {
-        MapSqlParameterSource parameters = getReviewParameters(review);
-        namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_USEFUL, parameters);
-        return review;
-    }
-
-    @Override
     public void deleteReviewById(Integer id) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_REVIEW_BY_ID, id);
     }
@@ -86,12 +79,19 @@ public class ReviewDBStorage implements ReviewStorage {
 
     @Override
     public void addLikeOrDislikeToReview(Integer id, Integer userId, Boolean isLike) {
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_ADD_LIKE_OR_DISLIKE, id, userId, isLike);
+        int useful = isLike ? 1 : -1;
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_ADD_LIKE_OR_DISLIKE, id, userId, useful);
+        updateUsefulInReview(id);
     }
 
     @Override
     public void deleteLikeOrDislikeToReview(Integer id, Integer userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_LIKE_OR_DISLIKE, id, userId);
+        updateUsefulInReview(id);
+    }
+
+    private void updateUsefulInReview(Integer id) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_UPDATE_USEFUL, id);
     }
 
     private MapSqlParameterSource getReviewParameters(Review review) {
