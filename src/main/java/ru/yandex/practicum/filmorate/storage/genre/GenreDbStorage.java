@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import java.util.Optional;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_ALL_GENRES;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_GENRE_BY_ID;
 
-@Component
+@Repository
 public class GenreDbStorage implements GenreStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
