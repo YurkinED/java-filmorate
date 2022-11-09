@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
@@ -22,7 +21,7 @@ public class DirectorService {
         return directorDbStorage.findAllDirectors();
     }
 
-    public Optional<Director> findDirectorById(@PathVariable int genreId) {
+    public Optional<Director> findDirectorById(int genreId) {
         return directorDbStorage.findDirectorById(genreId);
     }
 
