@@ -47,7 +47,7 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_CREATE_FILM, parameters, keyHolder, new String[]{"film_id"});
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(id);
-        return installFilmGenresAndDirectors(film);
+        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FilmDbStorage implements FilmStorage {
         MapSqlParameterSource parameters = getFilmParameters(film);
         parameters.addValue("film_id", filmId);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_FILM, parameters);
-        return installFilmGenresAndDirectors(film);
+        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
     }
 
     @Override
@@ -161,7 +161,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         ArrayList<Film> films = new ArrayList<>();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
 
@@ -220,18 +220,20 @@ public class FilmDbStorage implements FilmStorage {
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
+        Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
         while (genreRows.next()) {
             int genreId = genreRows.getInt("genre_id");
             String genreName = genreRows.getString("genre_name");
             int directorId = genreRows.getInt("director_id");
             String directorName = genreRows.getString("director_name");
             if (genreId != 0 && genreName != null) {
-                film.addGenresToFilm(new Genre(genreId, genreName));
+                genres.add(new Genre(genreId, genreName));
             }
             if (directorId != 0 && directorName != null) {
                 film.addDirectorToFilm(new Director(directorId, directorName));
             }
         }
+        film.setGenres(genres);
         return film;
     }
 
@@ -240,9 +242,9 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
         MapSqlParameterSource parameters;
 
-        Set<BaseEntity> genres = film.getGenres();
+        Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
-            for (BaseEntity element : film.getGenres()) {
+            for (Genre element : film.getGenres()) {
                 int genreId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
@@ -262,6 +264,9 @@ public class FilmDbStorage implements FilmStorage {
                 namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_DIRECTOR, parameters);
             }
         }
+
+        film.clearGenres();
+        film.clearDirectors();
         return film;
     }
 

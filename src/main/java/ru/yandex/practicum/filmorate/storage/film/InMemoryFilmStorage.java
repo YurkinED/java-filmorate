@@ -60,7 +60,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         return null;
     }
 
@@ -110,10 +110,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new InvalidIdException("Не удалось обновить фильм. Нет фильма с id: " + id);
         }
-    }
-
-    public void updateFilmsMap(int id, Film film) {
-        films.put(id, film);
     }
 
     private int incrementIdCounter() {

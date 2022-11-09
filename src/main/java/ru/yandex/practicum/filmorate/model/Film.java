@@ -27,26 +27,20 @@ public class Film {
     @NotNull
     private Mpa mpa;
 
-    private Set<BaseEntity> genres = new TreeSet<>(Comparator.comparingInt(BaseEntity::getId));
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
     private Set<Director> directors = new TreeSet<>(Comparator.comparingInt(Director::getId));
 
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;
 
-   public Film(int id, String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
+    public Film(int id, String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
-    }
-
-    public void addGenresToFilm(Genre genre) {
-        log.info("Метод addGenresToFilm в фильме запущен {}", genre);
-        genres.add(genre);
-        log.info("Жанры добавлены в фильм {}", genre);
     }
 
     public void addDirectorToFilm(Director director) {
@@ -58,4 +52,13 @@ public class Film {
     public int getYear() {
         return releaseDate.getYear();
     }
+
+    public void clearGenres() {
+        genres.clear();
+    }
+
+    public void clearDirectors() {
+        directors.clear();
+    }
+
 }
