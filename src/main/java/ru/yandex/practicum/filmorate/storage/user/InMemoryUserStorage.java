@@ -19,7 +19,6 @@ import java.util.Optional;
 @Deprecated
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
-
     private final UserValidator userValidator;
     private int id;
 
