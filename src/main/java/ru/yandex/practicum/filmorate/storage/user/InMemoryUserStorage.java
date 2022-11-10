@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -36,6 +37,45 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Optional<User> findUserById(int userId) {
         return Optional.ofNullable(users.get(userId));
+    }
+
+
+    @Override
+    public void createFeed(int userId, int entityId, int eventType, int operation) {
+
+    }
+
+    @Override
+    public Collection<Feed> showUsersFeeds(int id) {
+        return null;
+    }
+
+    @Override
+    public void deleteUserById(int userId) {
+
+    }
+
+    @Override
+    public Collection<User> showUserFriendsId(int userId) {
+        return null;
+    }
+
+    @Override
+    public Collection<User> showCommonFriends(int userId, int friendId) {
+        return null;
+    }
+
+    @Override
+    public boolean checkFriendshipExists(int userId, int friendId) {
+        return false;
+    }
+
+    @Override
+    public void removeFromFriends(int userId, int friendId) {
+    }
+
+    @Override
+    public void addToFriend(int userId, int friendId) {
     }
 
     public User createUser(@Valid User user) {

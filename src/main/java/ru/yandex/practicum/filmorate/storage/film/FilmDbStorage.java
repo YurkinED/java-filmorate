@@ -220,7 +220,7 @@ public class FilmDbStorage implements FilmStorage {
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
-        Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+        Set<Genre> genres = new TreeSet<>(Comparator.comparingLong(Genre::getId));
         while (genreRows.next()) {
             int genreId = genreRows.getInt("genre_id");
             String genreName = genreRows.getString("genre_name");
@@ -233,7 +233,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.addDirectorToFilm(new Director(directorId, directorName));
             }
         }
-        film.setGenres(genres);
         return film;
     }
 
@@ -245,7 +244,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
             for (Genre element : film.getGenres()) {
-                int genreId = element.getId();
+                long genreId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("genre_id", genreId);
@@ -257,7 +256,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
             for (Director element : film.getDirectors()) {
-                int directorId = element.getId();
+                long directorId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("director_id", directorId);

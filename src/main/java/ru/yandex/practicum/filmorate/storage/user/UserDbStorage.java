@@ -11,7 +11,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -40,10 +39,12 @@ public class UserDbStorage implements UserStorage {
 
     }
 
+    @Override
     public Collection<User> findAllUsers() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> makeUser(rs));
     }
 
+    @Override
     public User createUser(User user) {
         String name = user.getName();
 
@@ -60,6 +61,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    @Override
     public User updateUser(User user) {
         int userId = user.getId();
 
@@ -79,6 +81,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    @Override
     public Optional<User> findUserById(int userId) {
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, userId);
         if (userRows.next()) {
@@ -105,6 +108,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    @Override
     public boolean checkFriendshipExists(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
         SqlRowSet likeRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_CHECK_FRIENDSHIP_EXISTS, parameters);
@@ -115,11 +119,13 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    @Override
     public void addToFriend(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
         namedParameterJdbcTemplate.update(SQL_QUERY_ADD_TO_FRIEND, parameters);
     }
 
+    @Override
     public Collection<User> showUserFriendsId(int userId) {
         List<User> friendsList = new ArrayList<>();
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FRIENDS_BY_USER_ID, userId);
@@ -142,6 +148,7 @@ public class UserDbStorage implements UserStorage {
         return friendsList;
     }
 
+    @Override
     public Collection<User> showCommonFriends(int userId, int friendId) {
         findUserById(userId)
                 .orElseThrow(() -> new InvalidIdException("Нет пользователя с id " + userId));
@@ -152,20 +159,13 @@ public class UserDbStorage implements UserStorage {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public void removeFromFriends(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_FROM_FRIENDS, parameters);
     }
 
 
-    /*
-        public List<User> showUserFriends(int userId) {
-            return userDbStorage.findUserById(userId)
-                    .orElseThrow(() -> new InvalidIdException("Нет пользователя с таким id")).getFriends().stream()
-                    .map(commonId -> userDbStorage.findUserById(commonId).orElse(null))
-                    .collect(Collectors.toList());
-        }
-    */
     private User makeUser(ResultSet rs) throws SQLException {
         int id = rs.getInt("user_id");
         String email = rs.getString("email");
@@ -190,34 +190,7 @@ public class UserDbStorage implements UserStorage {
         parameters.addValue("second_user_id", friendId);
         return parameters;
     }
-
-    /*public Collection<Feed> showUsersFeeds(int id) {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
-                (rs, rowNum) -> makeFeed(id, rs), id);
-    }
-
-    private Feed makeFeed(int id, ResultSet rs) throws SQLException {
-        return new Feed(rs.getInt("feed_id"),
-                id,
-                rs.getInt("entity_id"),
-                rs.getString("event_type_name"),
-                rs.getString("operation_name"),
-                rs.getLong("creation_time"));
-    }
-
     @Override
-    public void createFeed(int userId, int entityId, int eventType, int operation) {
-        LocalDateTime now = LocalDateTime.now();
-        String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +
-                "values (?, ?, ?, ?, ?)";
-        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery,
-                userId,
-                eventType,
-                operation,
-                entityId,
-                Timestamp.valueOf(now).getTime());
-    }*/
-
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
     }

@@ -1,38 +1,32 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    private final UserDbStorage userDbStorage;
+    private final UserStorage userStorage;
     private final UserValidator userValidator;
     private final FeedStorage feedStorage;
 
-    @Autowired
-    public UserService(UserDbStorage userDbStorage, UserValidator userValidator, FeedStorage feedStorage) {
-        this.userDbStorage = userDbStorage;
-        this.userValidator = userValidator;
-        this.feedStorage = feedStorage;
-    }
-
     public void addToFriends(int userId, int friendId) {
-        Optional<User> optionalUser = userDbStorage.findUserById(userId);
-        Optional<User> optionalFriend = userDbStorage.findUserById(friendId);
+        Optional<User> optionalUser = userStorage.findUserById(userId);
+        Optional<User> optionalFriend = userStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (!userDbStorage.checkFriendshipExists(userId, friendId)) {
-                userDbStorage.addToFriend(userId, friendId);
+            if (!userStorage.checkFriendshipExists(userId, friendId)) {
+                userStorage.addToFriend(userId, friendId);
                 log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
                 feedStorage.createFeed (userId, friendId, Feed.Event.FRIEND,Feed.Operation.ADD);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} стали друзьями", userId, friendId);
@@ -47,12 +41,12 @@ public class UserService {
     }
 
     public void removeFromFriends(int userId, int friendId) {
-        Optional<User> optionalUser = userDbStorage.findUserById(userId);
-        Optional<User> optionalFriend = userDbStorage.findUserById(friendId);
+        Optional<User> optionalUser = userStorage.findUserById(userId);
+        Optional<User> optionalFriend = userStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (userDbStorage.checkFriendshipExists(userId, friendId)) {
-                userDbStorage.removeFromFriends(userId, friendId);
+            if (userStorage.checkFriendshipExists(userId, friendId)) {
+                userStorage.removeFromFriends(userId, friendId);
                 log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
                 feedStorage.createFeed (userId, friendId,Feed.Event.FRIEND,Feed.Operation.REMOVE);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} перестали быть друзьями", userId, friendId);
@@ -67,32 +61,32 @@ public class UserService {
     }
 
     public Collection<User> showCommonFriends(int userId, int friendId) {
-        return userDbStorage.showCommonFriends(userId, friendId);
+        return userStorage.showCommonFriends(userId, friendId);
     }
 
     public Collection<User> showUserFriends(int userId) {
-        return userDbStorage.showUserFriendsId(userId);
+        return userStorage.showUserFriendsId(userId);
     }
 
     public Collection<User> findAllUsers() {
-        return userDbStorage.findAllUsers();
+        return userStorage.findAllUsers();
     }
 
     public Optional<User> findUserById(int userId) {
-        return userDbStorage.findUserById(userId);
+        return userStorage.findUserById(userId);
     }
 
     public User createUser(User user) {
         userValidator.validator(user);
-        return userDbStorage.createUser(user);
+        return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
         userValidator.validator(user);
-        return userDbStorage.updateUser(user);
+        return userStorage.updateUser(user);
     }
 
     public void deleteUserById(int userId) {
-        userDbStorage.deleteUserById(userId);
+        userStorage.deleteUserById(userId);
     }
 }

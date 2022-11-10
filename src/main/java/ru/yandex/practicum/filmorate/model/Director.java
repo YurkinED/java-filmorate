@@ -14,7 +14,7 @@ public class Director extends BaseEntity {
     @NotBlank
     private String name;
 
-    public Director(int id, String name) {
+    public Director(long id, String name) {
         super(id);
         this.name = name;
     }
