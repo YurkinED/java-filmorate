@@ -15,8 +15,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

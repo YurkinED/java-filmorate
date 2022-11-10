@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.enums.SearchingParts;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
@@ -14,9 +15,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 
 @Slf4j
 @Service
@@ -103,12 +102,12 @@ public class FilmService {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
 }
 
-    public List<Film> searchFilms(String query, List<String> by) {
-        if (by.contains("title") && by.contains("director")) {
+    public List<Film> searchFilms(String query, List<SearchingParts> by) {
+        if (by.contains(SearchingParts.TITLE) && by.contains(SearchingParts.DIRECTOR)) {
             return filmStorage.searchFilmsByTitleAndDirector(query);
-        } else if (by.contains("title") && by.size() == 1) {
+        } else if (by.contains(SearchingParts.TITLE) && by.size() == 1) {
             return filmStorage.searchFilmsByTitle(query);
-        } else if (by.contains("director") && by.size() == 1){
+        } else if (by.contains(SearchingParts.DIRECTOR) && by.size() == 1) {
             return filmStorage.searchFilmsByDirector(query);
         } else {
             throw new BadSearchQueryException("Введен неверный поисковый запрос");

@@ -6,8 +6,6 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS likes CASCADE;
 DROP TABLE IF EXISTS friends CASCADE;
 DROP TABLE IF EXISTS feeds CASCADE;
-DROP TABLE IF EXISTS event_types CASCADE;
-DROP TABLE IF EXISTS operations CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS reviews_likes CASCADE;
 DROP TABLE IF EXISTS directors CASCADE;
@@ -103,20 +101,6 @@ CREATE TABLE films_directors
     director_id int REFERENCES directors (director_id) ON DELETE CASCADE
 );
 
-create table event_types
-(
-    event_type_id   INTEGER auto_increment
-        primary key,
-    event_type_name CHARACTER VARYING not null
-);
-
-create table operations
-(
-    operation_id   INTEGER auto_increment
-        primary key,
-    operation_name CHARACTER VARYING not null
-);
-
 create table feeds
 (
     feed_id       INTEGER auto_increment
@@ -128,13 +112,7 @@ create table feeds
     creation_time LONG                             not null,
     constraint feeds_user_FK
         foreign key (user_id) references users
-            on delete cascade/*,*/
-  /*  constraint "event_type_FK"
-        foreign key (event_type) references event_types
-            on delete cascade,
-    constraint "operation_FK"
-        foreign key (operation) references operations
-            on delete cascade*/
+            on delete cascade
 );
 
 

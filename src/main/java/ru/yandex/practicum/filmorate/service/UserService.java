@@ -12,8 +12,6 @@ import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.*;
 
-import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
-
 @Slf4j
 @Service
 public class UserService {

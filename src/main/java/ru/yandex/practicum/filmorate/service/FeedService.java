@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 
 import java.util.Collection;
 
