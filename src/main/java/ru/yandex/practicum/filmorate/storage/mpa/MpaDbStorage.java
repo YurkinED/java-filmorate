@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.S
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_MPA_BY_ID;
 
 @Component
+@Primary
 public class MpaDbStorage implements MpaStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

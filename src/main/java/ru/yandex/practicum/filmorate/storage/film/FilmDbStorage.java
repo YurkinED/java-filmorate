@@ -11,7 +11,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,12 +26,12 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @Primary
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final DirectorService directorService;
+    private final DirectorStorage directorStorage;
 
     @Autowired
-    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorService directorService) {
+    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorStorage directorStorage) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.directorService = directorService;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_CREATE_FILM, parameters, keyHolder, new String[]{"film_id"});
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(id);
-        return installFilmGenresAndDirectors(film);
+        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FilmDbStorage implements FilmStorage {
         MapSqlParameterSource parameters = getFilmParameters(film);
         parameters.addValue("film_id", filmId);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_FILM, parameters);
-        return installFilmGenresAndDirectors(film);
+        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
-        directorService.findDirectorById(directorId)
+        directorStorage.findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         ArrayList<Film> films = new ArrayList<>();
         SqlRowSet filmRows =
@@ -161,7 +161,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         ArrayList<Film> films = new ArrayList<>();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
 
@@ -175,95 +175,12 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
-
-    private Film addGenreAndDirectorToFilm(Film film) {
-        SqlRowSet genreRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
-        while (genreRows.next()) {
-            int genreId = genreRows.getInt("genre_id");
-            String genreName = genreRows.getString("genre_name");
-            int directorId = genreRows.getInt("director_id");
-            String directorName = genreRows.getString("director_name");
-            if (genreId != 0 && genreName != null) {
-                film.addGenresToFilm(new Genre(genreId, genreName));
-            }
-            if (directorId != 0 && directorName != null) {
-                film.addDirectorToFilm(new Director(directorId, directorName));
-            }
-        }
-        return film;
-    }
-
-    private Film installFilmGenresAndDirectors(Film film) {
-        int filmId = film.getId();
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
-        MapSqlParameterSource parameters;
-
-        Set<BaseEntity> genres = film.getGenres();
-        if (genres.size() > 0) {
-            for (BaseEntity element : film.getGenres()) {
-                int genreId = element.getId();
-                parameters = new MapSqlParameterSource();
-                parameters.addValue("film_id", filmId);
-                parameters.addValue("genre_id", genreId);
-                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_GENRE, parameters);
-            }
-        }
-
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
-        Set<Director> directors = film.getDirectors();
-        if (directors.size() > 0) {
-            for (Director element : film.getDirectors()) {
-                int directorId = element.getId();
-                parameters = new MapSqlParameterSource();
-                parameters.addValue("film_id", filmId);
-                parameters.addValue("director_id", directorId);
-                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_DIRECTOR, parameters);
-            }
-        }
-        return film;
-    }
-
-
-
-
-    private MapSqlParameterSource getFilmParameters(Film film) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("film_name", film.getName());
-        parameters.addValue("description", film.getDescription());
-        parameters.addValue("release_date", String.valueOf(film.getReleaseDate()));
-        parameters.addValue("duration", film.getDuration());
-        parameters.addValue("mpa_id", film.getMpa().getId());
-        return parameters;
-    }
-
-    private MapSqlParameterSource getLikeParameters(int filmId, int userId) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("film_id", filmId);
-        parameters.addValue("user_id", userId);
-        return parameters;
-    }
-
     @Override
-    public Collection<Film> getRecommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
                 SQL_QUERY_TAKE_RECOMMENDED_FILMS,
                 (rowSet, rowNum) -> makeFilmFromRs(rowSet),
                 userId, userId, userId));
-    }
-
-    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("film_name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration");
-        int mpaId = rs.getInt("mpa_id");
-        String mpaName = rs.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(rs.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
-
     }
 
     @Override
@@ -285,6 +202,89 @@ public class FilmDbStorage implements FilmStorage {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
                 query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
+    }
+
+    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
+        int id = rs.getInt("film_id");
+        String name = rs.getString("film_name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration");
+        int mpaId = rs.getInt("mpa_id");
+        String mpaName = rs.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(rs.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
+    }
+
+    private Film addGenreAndDirectorToFilm(Film film) {
+        SqlRowSet genreRows = namedParameterJdbcTemplate
+                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
+        Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+        while (genreRows.next()) {
+            int genreId = genreRows.getInt("genre_id");
+            String genreName = genreRows.getString("genre_name");
+            int directorId = genreRows.getInt("director_id");
+            String directorName = genreRows.getString("director_name");
+            if (genreId != 0 && genreName != null) {
+                genres.add(new Genre(genreId, genreName));
+            }
+            if (directorId != 0 && directorName != null) {
+                film.addDirectorToFilm(new Director(directorId, directorName));
+            }
+        }
+        film.setGenres(genres);
+        return film;
+    }
+
+    private Film installFilmGenresAndDirectors(Film film) {
+        int filmId = film.getId();
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
+        MapSqlParameterSource parameters;
+
+        Set<Genre> genres = film.getGenres();
+        if (genres.size() > 0) {
+            for (Genre element : film.getGenres()) {
+                int genreId = element.getId();
+                parameters = new MapSqlParameterSource();
+                parameters.addValue("film_id", filmId);
+                parameters.addValue("genre_id", genreId);
+                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_GENRE, parameters);
+            }
+        }
+
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
+        Set<Director> directors = film.getDirectors();
+        if (directors.size() > 0) {
+            for (Director element : film.getDirectors()) {
+                int directorId = element.getId();
+                parameters = new MapSqlParameterSource();
+                parameters.addValue("film_id", filmId);
+                parameters.addValue("director_id", directorId);
+                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_DIRECTOR, parameters);
+            }
+        }
+
+        film.clearGenres();
+        film.clearDirectors();
+        return film;
+    }
+
+    private MapSqlParameterSource getFilmParameters(Film film) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("film_name", film.getName());
+        parameters.addValue("description", film.getDescription());
+        parameters.addValue("release_date", String.valueOf(film.getReleaseDate()));
+        parameters.addValue("duration", film.getDuration());
+        parameters.addValue("mpa_id", film.getMpa().getId());
+        return parameters;
+    }
+
+    private MapSqlParameterSource getLikeParameters(int filmId, int userId) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("film_id", filmId);
+        parameters.addValue("user_id", userId);
+        return parameters;
     }
 
 

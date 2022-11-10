@@ -20,9 +20,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class FilmService {
+
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
-
     private final FeedStorage feedStorage;
     private final FilmValidator filmValidator;
 
@@ -82,7 +82,7 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public Collection<Film> getRecommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         return filmStorage.getRecommendations(userId);
     }
 
@@ -98,7 +98,7 @@ public class FilmService {
         filmStorage.deleteFilmById(filmId);
     }
 
-    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
 }
 
