@@ -227,13 +227,13 @@ public class FilmDbStorage implements FilmStorage {
             int directorId = genreRows.getInt("director_id");
             String directorName = genreRows.getString("director_name");
             if (genreId != 0 && genreName != null) {
+                film.addGenresToFilm(new Gere(genreId, genreName));
                 genres.add(new Genre(genreId, genreName));
             }
             if (directorId != 0 && directorName != null) {
                 film.addDirectorToFilm(new Director(directorId, directorName));
             }
         }
-        film.setGenres(genres);
         return film;
     }
 
@@ -245,7 +245,6 @@ public class FilmDbStorage implements FilmStorage {
         Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
             for (Genre element : film.getGenres()) {
-                int genreId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("genre_id", genreId);
@@ -257,7 +256,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
             for (Director element : film.getDirectors()) {
-                int directorId = element.getId();
+                long directorId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("director_id", directorId);

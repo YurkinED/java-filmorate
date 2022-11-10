@@ -29,7 +29,7 @@ public class Film {
 
     private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
-    private Set<Director> directors = new TreeSet<>(Comparator.comparingInt(Director::getId));
+    private Set<Director> directors = new TreeSet<>(Comparator.comparingLong(Director::getId));
 
     /* private Set<Integer> likes = new TreeSet<>();*/
     private int rating;

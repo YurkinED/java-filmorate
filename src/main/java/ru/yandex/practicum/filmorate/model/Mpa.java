@@ -10,7 +10,7 @@ import lombok.Value;
 public class Mpa extends BaseEntity {
     private String name;
 
-    public Mpa(int id, String name) {
+    public Mpa(long id, String name) {
         super(id);
         this.name = name;
     }

@@ -8,7 +8,7 @@ import lombok.*;
 public class Genre extends BaseEntity {
     private String name;
 
-    public Genre(int id, String name) {
+    public Genre(long id, String name) {
         super(id);
         this.name = name;
     }
