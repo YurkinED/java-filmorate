@@ -233,6 +233,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.addDirectorToFilm(new Director(directorId, directorName));
             }
         }
+        film.setGenres(genres);
         return film;
     }
 
