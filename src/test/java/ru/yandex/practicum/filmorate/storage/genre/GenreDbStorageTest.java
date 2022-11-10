@@ -30,6 +30,7 @@ public class GenreDbStorageTest {
     }
 
     @Test
+    @Deprecated
     @DisplayName("Тест на поиск жанра по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindGenreById() {
@@ -38,7 +39,7 @@ public class GenreDbStorageTest {
         assertThat(genreOptional)
                 .isPresent()
                 .hasValueSatisfying(genre ->
-                        assertThat(genre).hasFieldOrPropertyWithValue("id", 2));
+                        assertThat(genre).hasFieldOrPropertyWithValue("id", 2L));
         assertThat(genreOptional)
                 .isPresent()
                 .hasValueSatisfying(genre ->

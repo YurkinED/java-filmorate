@@ -33,12 +33,12 @@ public class DirectorDbStorageTest {
     @DisplayName("Тест на поиск режиссера по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testGetDirectorById() {
-        Optional<Director> directorOptional = directorDbStorage.findDirectorById(4);
+        Optional<Director> directorOptional = directorDbStorage.findDirectorById(4L);
 
         assertThat(directorOptional)
                 .isPresent()
                 .hasValueSatisfying(director ->
-                        assertThat(director).hasFieldOrPropertyWithValue("id", 4));
+                        assertThat(director).hasFieldOrPropertyWithValue("id", 4L));
         assertThat(directorOptional)
                 .isPresent()
                 .hasValueSatisfying(director ->
@@ -52,7 +52,7 @@ public class DirectorDbStorageTest {
         Director testDirector = new Director(7, "Кристофер Нолан");
         Director directorCreated = directorDbStorage.createDirector(testDirector);
 
-        assertThat(directorCreated).hasFieldOrPropertyWithValue("id", 7);
+        assertThat(directorCreated).hasFieldOrPropertyWithValue("id", 7L);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class DirectorDbStorageTest {
         Director testDirector = new Director(1, "Кристофер Нолан");
         Director directorCreated = directorDbStorage.updateDirector(testDirector);
 
-        assertThat(directorCreated).hasFieldOrPropertyWithValue("id", 1);
+        assertThat(directorCreated).hasFieldOrPropertyWithValue("id", 1L);
         assertThat(directorCreated).hasFieldOrPropertyWithValue("name", "Кристофер Нолан");
     }
 

@@ -30,6 +30,7 @@ public class MpaDbStorageTest {
     }
 
     @Test
+    @Deprecated
     @DisplayName("Тест на поиск mpa по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindMpaById() {
@@ -38,7 +39,7 @@ public class MpaDbStorageTest {
         assertThat(mpaOptional)
                 .isPresent()
                 .hasValueSatisfying(mpa ->
-                        assertThat(mpa).hasFieldOrPropertyWithValue("id", 3));
+                        assertThat(mpa).hasFieldOrPropertyWithValue("id", 3L));
         assertThat(mpaOptional)
                 .isPresent()
                 .hasValueSatisfying(mpa ->

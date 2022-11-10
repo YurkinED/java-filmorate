@@ -39,18 +39,6 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @DisplayName("Тест на создание пользователя с пустым именем")
-    @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
-    public void testCreateUserWithEmptyName() {
-        User testUser = new User(1, "solntmore@gmail.com", RandomString.make(10),
-                "", BIRTHDAY);
-        User userCreated = userStorage.createUser(testUser);
-
-        assertThat(userCreated).hasFieldOrPropertyWithValue("id", 5);
-        assertThat(userCreated).hasFieldOrPropertyWithValue("name", userCreated.getLogin());
-    }
-
-    @Test
     @DisplayName("Тест на поиск всех пользователей")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testFindAllUsers() {
