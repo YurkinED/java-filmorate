@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.feed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Feed;
 
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import java.util.Collection;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_SHOW_FEEDS_BY_USER_ID;
 @Slf4j
-@Component
+@Repository
 public class FeedDbStorage implements FeedStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 

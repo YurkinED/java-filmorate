@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
-    Collection<Film> findAllFilms();
+    List<Film> findAllFilms();
 
     Film createFilm(@Valid Film film);
 

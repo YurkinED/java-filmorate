@@ -8,16 +8,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,12 +23,12 @@ import static org.junit.platform.commons.util.StringUtils.isBlank;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*;
 
 @Slf4j
-@Component
+@Repository
 @Primary
 public class UserDbStorage implements UserStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     public UserDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -46,11 +43,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        String name = user.getName();
 
-        if (isBlank(name)) {
-            user.setName(user.getLogin());
-        }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource parameters = getUserParameters(user);
 
@@ -85,13 +78,7 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> findUserById(int userId) {
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, userId);
         if (userRows.next()) {
-            User user = new User(
-                    userRows.getInt("user_id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    Objects.requireNonNull(userRows.getDate("birthday")).toLocalDate());
-
+            User user = makeUser(userRows);
             log.info("Найден пользователь: {} {}", user.getId(), user.getName());
             return Optional.of(user);
         } else {
@@ -135,12 +122,7 @@ public class UserDbStorage implements UserStorage {
 
             SqlRowSet friendRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, friendId);
             friendRows.first();
-            User user = new User(
-                    friendRows.getInt("user_id"),
-                    friendRows.getString("email"),
-                    friendRows.getString("login"),
-                    friendRows.getString("name"),
-                    Objects.requireNonNull(friendRows.getDate("birthday")).toLocalDate());
+            User user =  makeUser(friendRows);
 
             friendsList.add(user);
             log.info("В список друзей добавлен пользователь: {} {}", user.getId(), user.getName());
@@ -165,8 +147,22 @@ public class UserDbStorage implements UserStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_FROM_FRIENDS, parameters);
     }
 
+    @Override
+    public void deleteUserById(int userId) {
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
+    }
+
 
     private User makeUser(ResultSet rs) throws SQLException {
+        int id = rs.getInt("user_id");
+        String email = rs.getString("email");
+        String login = rs.getString("login");
+        String name = rs.getString("name");
+        LocalDate birthday = rs.getDate("birthday").toLocalDate();
+        return new User(id, email, login, name, birthday);
+    }
+
+    private User makeUser(SqlRowSet rs) {
         int id = rs.getInt("user_id");
         String email = rs.getString("email");
         String login = rs.getString("login");
@@ -190,9 +186,6 @@ public class UserDbStorage implements UserStorage {
         parameters.addValue("second_user_id", friendId);
         return parameters;
     }
-    @Override
-    public void deleteUserById(int userId) {
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
-    }
+
 }
 

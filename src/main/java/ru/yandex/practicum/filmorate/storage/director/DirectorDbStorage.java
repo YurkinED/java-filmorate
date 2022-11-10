@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Director;
 
@@ -20,7 +20,7 @@ import java.util.Optional;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_REMOVE_DIRECTOR;
 
-@Component
+@Repository
 @Primary
 public class DirectorDbStorage implements DirectorStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

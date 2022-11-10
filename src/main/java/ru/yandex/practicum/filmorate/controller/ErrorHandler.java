@@ -45,6 +45,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity< String > exc(ConstraintViolationException ex){
+        log.debug("Упс. Кажется, возникла ошибка {},", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

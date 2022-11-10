@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.*;
 
+import static org.junit.platform.commons.util.StringUtils.isBlank;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -78,6 +80,12 @@ public class UserService {
 
     public User createUser(User user) {
         userValidator.validator(user);
+        String name = user.getName();
+
+        if (isBlank(name)) {
+            user.setName(user.getLogin());
+        }
+
         return userStorage.createUser(user);
     }
 

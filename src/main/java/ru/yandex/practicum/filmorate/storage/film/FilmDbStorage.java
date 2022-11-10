@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
@@ -22,7 +22,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_DELETE_FILM_BY_ID;
 
 @Slf4j
-@Component
+@Repository
 @Primary
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -35,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS,
                 (rs, rowNum) -> makeFilmFromRs(rs));
     }
@@ -142,18 +142,7 @@ public class FilmDbStorage implements FilmStorage {
         return returnList;
     }
 
-    private Film makeFilm(SqlRowSet filmRows) {
-        int id = filmRows.getInt("film_id");
-        String name = filmRows.getString("film_name");
-        String description = filmRows.getString("description");
-        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
-        long duration = filmRows.getLong("duration");
-        int mpaId = filmRows.getInt("mpa_id");
-        String mpaName = filmRows.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(filmRows.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
-    }
+
 
     @Override
     public void deleteFilmById(int filmId) {
@@ -285,6 +274,19 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("film_id", filmId);
         parameters.addValue("user_id", userId);
         return parameters;
+    }
+
+    private Film makeFilm(SqlRowSet filmRows) {
+        int id = filmRows.getInt("film_id");
+        String name = filmRows.getString("film_name");
+        String description = filmRows.getString("description");
+        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
+        long duration = filmRows.getLong("duration");
+        int mpaId = filmRows.getInt("mpa_id");
+        String mpaName = filmRows.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(filmRows.getInt("rating"));
+        return addGenreAndDirectorToFilm(film);
     }
 
 
