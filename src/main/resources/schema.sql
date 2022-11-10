@@ -159,10 +159,7 @@ CREATE TABLE IF NOT EXISTS feeds
     event_type    ENUM ('LIKE', 'REVIEW','FRIEND') not null,
     operation     ENUM ('REMOVE', 'ADD','UPDATE')  not null,
     entity_id     INTEGER                          not null,
-    creation_time LONG                             not null,
-    constraint feeds_user_FK
-        foreign key (user_id) references users
-            on delete cascade
+    creation_time LONG                             not null
 );
 
 
