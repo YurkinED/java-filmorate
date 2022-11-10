@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -62,12 +61,14 @@ public class FilmController {
             case YEAR:
                 log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} по годам.",
                         directorId, directorId);
-                directorFilms = filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR);
+                directorFilms = filmService.showDirectorsFilmsAndSort(directorId,
+                        SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR);
                 break;
             default:
                 log.debug("Получен запрос GET /films/director/{}?sortBy=[likes]. Показать топ фильмов режиссера {} " +
                         "по популярности.", directorId, directorId);
-                directorFilms = filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
+                directorFilms = filmService.showDirectorsFilmsAndSort(directorId,
+                        SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
                 break;
         }
         return directorFilms;
