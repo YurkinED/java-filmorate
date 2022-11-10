@@ -3,18 +3,21 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
@@ -39,11 +42,14 @@ public class FilmController {
     }
 
     @GetMapping(value = {"/popular"})
-    public List<Film> showMostLikedFilms(@RequestParam(name = "count", required = false, defaultValue = "10") Integer limit,
-                                         @RequestParam(name = "genreId", required = false, defaultValue = "0") Integer genreId,
-                                         @RequestParam(name = "year",  required = false, defaultValue = "0") String year) {
+    public List<Film> showMostLikedFilms(@RequestParam(name = "count", required = false, defaultValue = "10")
+                                         @Min(1) Integer limit,
+                                         @RequestParam(name = "genreId", required = false, defaultValue = "0")
+                                         Integer genreId,
+                                         @RequestParam(name = "year", required = false, defaultValue = "10000")
+                                         @Min(1895) Integer year) {
         log.debug("Получен запрос GET /films/popular?count={}&genreId={}&year={}. Показать топ фильмов по лайкам " +
-                "с id жанра {} за {} год.",limit, genreId, year, genreId, year);
+                "с id жанра {} за {} год.", limit, genreId, year, genreId, year);
         return filmService.showMostLikedFilmsFilter(limit, genreId, year);
     }
 
@@ -63,7 +69,8 @@ public class FilmController {
 
     @GetMapping(value = {"/common"})
     public List<Film> showCommonLikedFilms(@RequestParam int userId, @RequestParam int friendId) {
-        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по их популярности..", userId, friendId);
+        log.debug("Получен запрос GET common?userId={}&friendId={}. Вывод общих с другом фильмов с сортировкой по " +
+                "их популярности..", userId, friendId);
         return filmService.showCommonLikedFilms(userId, friendId);
     }
 

@@ -99,7 +99,7 @@ public class SqlQueryConstantsForFilm {
             "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id          \n" +
             "LEFT JOIN films_genres fg on f.film_id = fg.film_id\n" +
             "JOIN (select CAST(:genre_id as INTEGER) as genre_id, CAST(:year as INTEGER) as year_id FROM dual) flt on 1=1  \n" +
-            "where (EXTRACT(YEAR FROM f.release_date) = flt.year_id  or flt.year_id='0') \n" +
+            "where (EXTRACT(YEAR FROM f.release_date) = flt.year_id  or flt.year_id='10000') \n" +
             "and  (fg.genre_id = flt.genre_id or flt.genre_id=0)\n" +
             "ORDER BY rating DESC                               \n" +
             "LIMIT :limit                                       \n";

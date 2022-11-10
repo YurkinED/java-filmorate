@@ -26,9 +26,9 @@ public interface FilmStorage {
 
     void deleteFilmById(int filmId);
 
-    List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year);
+    List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year);
 
-    Collection<Film> getRecommendations(int userId);
+    List<Film> getRecommendations(int userId);
 
     List<Film> searchFilmsByTitle(String query);
 

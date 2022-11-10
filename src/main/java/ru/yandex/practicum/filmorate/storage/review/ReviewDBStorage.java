@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -20,6 +21,7 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForReview
 
 @Repository
 @RequiredArgsConstructor
+@Primary
 public class ReviewDBStorage implements ReviewStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

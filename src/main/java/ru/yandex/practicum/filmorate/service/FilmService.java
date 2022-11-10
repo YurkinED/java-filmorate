@@ -7,24 +7,23 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 
 @Slf4j
 @Service
 public class FilmService {
-    private final FilmDbStorage filmStorage;
-    private final UserDbStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private final FilmValidator filmValidator;
 
     @Autowired
-    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, FilmValidator filmValidator) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.filmValidator = filmValidator;
@@ -81,7 +80,7 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public Collection<Film> getRecommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         return filmStorage.getRecommendations(userId);
     }
 
@@ -97,7 +96,7 @@ public class FilmService {
         filmStorage.deleteFilmById(filmId);
     }
 
-    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, String year) {
+    public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
 }
 
