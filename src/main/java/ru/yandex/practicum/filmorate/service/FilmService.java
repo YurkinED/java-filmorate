@@ -3,60 +3,62 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.enums.SearchingParts;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
 
-import static ru.yandex.practicum.filmorate.constants.UsualConstants.*;
 
 @Slf4j
 @Service
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+
+    private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
+    private final FeedStorage feedStorage;
     private final FilmValidator filmValidator;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage, FilmValidator filmValidator) {
+    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, FilmValidator filmValidator, FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.filmValidator = filmValidator;
+        this.feedStorage = feedStorage;
     }
 
-
     public void addLikeToFilm(int filmId, int userId) {
-        if (userStorage.findUserById(userId).isPresent()
-                && filmStorage.findFilmById(filmId).isPresent()) {
-            if (!filmStorage.checkLikeFilm(filmId, userId)) {
-                filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
-                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_ADD);
-                log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
-            } else {
-                throw new LikesException("Вы уже поставили лайк ранее.");
-            }
+        userStorage.findUserById(userId).orElseThrow(
+                () -> new InvalidIdException("Пользователь с id" + userId + " не найден"));
+        filmStorage.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
+        if (!filmStorage.checkLikeFilm(filmId, userId)) {
+            filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
+            feedStorage.createFeed(userId, filmId, Feed.Event.LIKE, Feed.Operation.ADD);
+            log.warn("Добавлена информация в ленту: пользователь id {} поставил лайк фильму {}", userId, filmId);
         } else {
-            throw new InvalidIdException("Неверно введен id пользователя или фильма.");
+            throw new LikesException("Вы уже поставили лайк ранее.");
         }
     }
 
     public void removeLikeFromFilm(int filmId, int userId) {
-        if (userStorage.findUserById(userId).isPresent()
-                && filmStorage.findFilmById(filmId).isPresent()) {
-            if (filmStorage.checkLikeFilm(filmId, userId)) {
-                filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
-                userStorage.createFeed (userId, filmId,EVENT_TYPE_LIKE,OPERATION_REMOVE);
-                log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
-            } else {
-                throw new LikesException("Вы еще не поставили лайк.");
-            }
+        userStorage.findUserById(userId).orElseThrow(
+                () -> new InvalidIdException("Пользователь с id" + userId + " не найден"));
+        filmStorage.findFilmById(filmId).orElseThrow(
+                () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
+        if (filmStorage.checkLikeFilm(filmId, userId)) {
+            filmStorage.likeFilmOrRemoveLike(filmId, userId, false);
+            feedStorage.createFeed(userId, filmId, Feed.Event.LIKE, Feed.Operation.REMOVE);
+            log.warn("Добавлена информация в ленту: пользователь id {} удалил лайк фильму {}", userId, filmId);
         } else {
-            throw new InvalidIdException("Неверно введен id пользователя или фильма.");
+            throw new LikesException("Вы еще не поставили лайк.");
         }
     }
 
@@ -100,16 +102,15 @@ public class FilmService {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
 }
 
-    public List<Film> searchFilms(String query, List<String> by) {
-        if (by.contains("title") && by.contains("director")) {
+    public List<Film> searchFilms(String query, List<SearchingParts> by) {
+        if (by.contains(SearchingParts.TITLE) && by.contains(SearchingParts.DIRECTOR)) {
             return filmStorage.searchFilmsByTitleAndDirector(query);
-        } else if (by.contains("title") && by.size() == 1) {
+        } else if (by.contains(SearchingParts.TITLE) && by.size() == 1) {
             return filmStorage.searchFilmsByTitle(query);
-        } else if (by.contains("director") && by.size() == 1){
+        } else if (by.contains(SearchingParts.DIRECTOR) && by.size() == 1) {
             return filmStorage.searchFilmsByDirector(query);
         } else {
             throw new BadSearchQueryException("Введен неверный поисковый запрос");
         }
-
     }
 }

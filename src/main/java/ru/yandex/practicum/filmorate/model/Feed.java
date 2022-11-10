@@ -13,7 +13,19 @@ public class Feed {
     private int eventId;
     private int userId;
     private int entityId;
-    private String eventType;
-    private String operation;
+    private Event eventType;
+    private Operation operation;
     private Long timestamp;
+
+    public enum Event {
+        LIKE,
+        REVIEW,
+        FRIEND
+    }
+
+    public enum Operation {
+        REMOVE,
+        ADD,
+        UPDATE
+    }
 }

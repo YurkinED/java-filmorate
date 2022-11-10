@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.enums.SearchingParts;
+import ru.yandex.practicum.filmorate.enums.SortingChoices;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -53,18 +54,24 @@ public class FilmController {
         return filmService.showMostLikedFilmsFilter(limit, genreId, year);
     }
 
-
     @GetMapping("director/{directorId}")
-    public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam(name = "sortBy") String sortBy) {
-        if (sortBy.equals("year")) {
-            log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} по годам.",
-                    directorId, directorId);
-            return filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR);
-        } else {
-            log.debug("Получен запрос GET /films/director/{}?sortBy=[like]. Показать топ фильмов режиссера {} " +
-                    "по популярности.", directorId, directorId);
-            return filmService.showDirectorsFilmsAndSort(directorId, SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
+    public List<Film> showDirectorFilms(@PathVariable int directorId, @RequestParam("sortBy") SortingChoices sortBy ) {
+        List<Film> directorFilms;
+        switch (sortBy) {
+            case YEAR:
+                log.debug("Получен запрос GET /films/director/{}?sortBy=[year]. Показать топ фильмов режиссера {} по годам.",
+                        directorId, directorId);
+                directorFilms = filmService.showDirectorsFilmsAndSort(directorId,
+                        SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR);
+                break;
+            default:
+                log.debug("Получен запрос GET /films/director/{}?sortBy=[likes]. Показать топ фильмов режиссера {} " +
+                        "по популярности.", directorId, directorId);
+                directorFilms = filmService.showDirectorsFilmsAndSort(directorId,
+                        SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING);
+                break;
         }
+        return directorFilms;
     }
 
     @GetMapping(value = {"/common"})
@@ -108,7 +115,7 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public List<Film> searchFilms(@RequestParam String query, @RequestParam List<String> by) {
+    public List<Film> searchFilms(@RequestParam String query, @RequestParam List<SearchingParts> by) {
         log.debug("Получен запрос GET /films/search. Найти фильм по запросу {} ", query);
         return filmService.searchFilms(query, by);
     }

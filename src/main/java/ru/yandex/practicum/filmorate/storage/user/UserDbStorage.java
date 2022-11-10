@@ -190,35 +190,6 @@ public class UserDbStorage implements UserStorage {
         parameters.addValue("second_user_id", friendId);
         return parameters;
     }
-
-    @Override
-    public Collection<Feed> showUsersFeeds(int id) {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
-                (rs, rowNum) -> makeFeed(id, rs), id);
-    }
-
-    private Feed makeFeed(int id, ResultSet rs) throws SQLException {
-        return new Feed(rs.getInt("feed_id"),
-                id,
-                rs.getInt("entity_id"),
-                rs.getString("event_type_name"),
-                rs.getString("operation_name"),
-                rs.getLong("creation_time"));
-    }
-
-    @Override
-    public void createFeed(int userId, int entityId, int eventType, int operation) {
-        LocalDateTime now = LocalDateTime.now();
-        String sqlQuery = "insert into feeds(user_id, event_type, operation, entity_id, creation_time) " +
-                "values (?, ?, ?, ?, ?)";
-        namedParameterJdbcTemplate.getJdbcTemplate().update(sqlQuery,
-                userId,
-                eventType,
-                operation,
-                entityId,
-                Timestamp.valueOf(now).getTime());
-    }
-
     @Override
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
