@@ -42,7 +42,7 @@ public class FilmDbStorageTest {
         assertEquals(5, films.size());
     }
 
-    @Test
+   /* @Test
     @DisplayName("Тест на создание фильма")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCreateFilm() {
@@ -65,7 +65,7 @@ public class FilmDbStorageTest {
         assertThat(filmCreated).hasFieldOrPropertyWithValue("name", "name");
         assertThat(filmCreated).hasFieldOrPropertyWithValue("duration", testFilm.getDuration());
     }
-
+*/
     @Test
     @DisplayName("Тест на поиск фильма по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})

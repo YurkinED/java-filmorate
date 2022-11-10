@@ -220,14 +220,13 @@ public class FilmDbStorage implements FilmStorage {
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
-        Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+        Set<Genre> genres = new TreeSet<>(Comparator.comparingLong(Genre::getId));
         while (genreRows.next()) {
             int genreId = genreRows.getInt("genre_id");
             String genreName = genreRows.getString("genre_name");
             int directorId = genreRows.getInt("director_id");
             String directorName = genreRows.getString("director_name");
             if (genreId != 0 && genreName != null) {
-                film.addGenresToFilm(new Gere(genreId, genreName));
                 genres.add(new Genre(genreId, genreName));
             }
             if (directorId != 0 && directorName != null) {
@@ -245,6 +244,7 @@ public class FilmDbStorage implements FilmStorage {
         Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
             for (Genre element : film.getGenres()) {
+                long genreId = element.getId();
                 parameters = new MapSqlParameterSource();
                 parameters.addValue("film_id", filmId);
                 parameters.addValue("genre_id", genreId);

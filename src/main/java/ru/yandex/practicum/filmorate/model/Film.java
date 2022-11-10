@@ -27,7 +27,7 @@ public class Film {
     @NotNull
     private Mpa mpa;
 
-    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingLong(Genre::getId));
 
     private Set<Director> directors = new TreeSet<>(Comparator.comparingLong(Director::getId));
 
