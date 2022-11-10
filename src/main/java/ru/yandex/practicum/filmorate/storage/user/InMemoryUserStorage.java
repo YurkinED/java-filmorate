@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -37,17 +35,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Optional<User> findUserById(int userId) {
         return Optional.ofNullable(users.get(userId));
-    }
-
-
-    @Override
-    public void createFeed(int userId, int entityId, int eventType, int operation) {
-
-    }
-
-    @Override
-    public Collection<Feed> showUsersFeeds(int id) {
-        return null;
     }
 
     @Override
