@@ -17,7 +17,7 @@ public interface UserStorage {
     Optional<User> findUserById(int userId);
     void deleteUserById(int userId);
 
-    Collection<User> showUserFriendsId(int userId);
+   /* Collection<User> showUserFriendsId(int userId);
 
     Collection<User> showCommonFriends(int userId, int friendId);
 
@@ -25,5 +25,5 @@ public interface UserStorage {
 
     void removeFromFriends(int userId, int friendId);
 
-    void addToFriend(int userId, int friendId);
+    void addToFriend(int userId, int friendId);*/
 }

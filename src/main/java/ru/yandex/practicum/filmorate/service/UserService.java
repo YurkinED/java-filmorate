@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -22,13 +23,15 @@ public class UserService {
     private final UserValidator userValidator;
     private final FeedStorage feedStorage;
 
+    private final FriendStorage friendStorage;
+
     public void addToFriends(int userId, int friendId) {
         Optional<User> optionalUser = userStorage.findUserById(userId);
         Optional<User> optionalFriend = userStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (!userStorage.checkFriendshipExists(userId, friendId)) {
-                userStorage.addToFriend(userId, friendId);
+            if (!friendStorage.checkFriendshipExists(userId, friendId)) {
+                friendStorage.addToFriend(userId, friendId);
                 log.warn("Пользователь {} и {} стали друзьями", userId, friendId);
                 feedStorage.createFeed (userId, friendId, Feed.Event.FRIEND,Feed.Operation.ADD);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} стали друзьями", userId, friendId);
@@ -47,8 +50,8 @@ public class UserService {
         Optional<User> optionalFriend = userStorage.findUserById(friendId);
         if (optionalUser.isPresent()
                 && optionalFriend.isPresent()) {
-            if (userStorage.checkFriendshipExists(userId, friendId)) {
-                userStorage.removeFromFriends(userId, friendId);
+            if (friendStorage.checkFriendshipExists(userId, friendId)) {
+                friendStorage.removeFromFriends(userId, friendId);
                 log.warn("Пользователь {} и {} перестали быть друзьями", userId, friendId);
                 feedStorage.createFeed (userId, friendId,Feed.Event.FRIEND,Feed.Operation.REMOVE);
                 log.warn("Добавлена информация в ленту: пользователь {} и {} перестали быть друзьями", userId, friendId);
@@ -63,11 +66,15 @@ public class UserService {
     }
 
     public Collection<User> showCommonFriends(int userId, int friendId) {
-        return userStorage.showCommonFriends(userId, friendId);
+        findUserById(userId)
+                .orElseThrow(() -> new InvalidIdException("Нет пользователя с id " + userId));
+        findUserById(friendId)
+                .orElseThrow(() -> new InvalidIdException("Нет пользователя с id " + friendId));
+        return friendStorage.showCommonFriends(userId, friendId);
     }
 
     public Collection<User> showUserFriends(int userId) {
-        return userStorage.showUserFriendsId(userId);
+        return friendStorage.showUserFriendsId(userId);
     }
 
     public Collection<User> findAllUsers() {

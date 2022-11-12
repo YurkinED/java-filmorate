@@ -38,30 +38,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void deleteUserById(int userId) {
-
-    }
-
-    @Override
-    public Collection<User> showUserFriendsId(int userId) {
-        return null;
-    }
-
-    @Override
-    public Collection<User> showCommonFriends(int userId, int friendId) {
-        return null;
-    }
-
-    @Override
-    public boolean checkFriendshipExists(int userId, int friendId) {
-        return false;
-    }
-
-    @Override
-    public void removeFromFriends(int userId, int friendId) {
-    }
-
-    @Override
-    public void addToFriend(int userId, int friendId) {
     }
 
     public User createUser(@Valid User user) {

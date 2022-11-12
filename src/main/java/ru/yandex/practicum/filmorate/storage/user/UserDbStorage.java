@@ -95,7 +95,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    @Override
+    /*@Override
     public boolean checkFriendshipExists(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
         SqlRowSet likeRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_CHECK_FRIENDSHIP_EXISTS, parameters);
@@ -146,7 +146,7 @@ public class UserDbStorage implements UserStorage {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_FROM_FRIENDS, parameters);
     }
-
+*/
     @Override
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
@@ -180,12 +180,12 @@ public class UserDbStorage implements UserStorage {
         return parameters;
     }
 
-    private MapSqlParameterSource makeFriendsParameters(int userId, int friendId) {
+    /*private MapSqlParameterSource makeFriendsParameters(int userId, int friendId) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("first_user_id", userId);
         parameters.addValue("second_user_id", friendId);
         return parameters;
-    }
+    }*/
 
 }
 
