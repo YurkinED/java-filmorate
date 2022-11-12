@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+@Deprecated
 @Component
 public class UserValidator {
     public void validator(User user) {

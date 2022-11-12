@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.*;
 
@@ -17,7 +16,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    private final UserValidator userValidator;
     private final FeedStorage feedStorage;
 
     public void addToFriends(int userId, int friendId) {
@@ -77,12 +75,10 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        userValidator.validator(user);
         return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
-        userValidator.validator(user);
         return userStorage.updateUser(user);
     }
 
