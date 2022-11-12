@@ -10,11 +10,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findAllUsers() {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> makeUser(rs));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> Mapper.makeUser(rs));
     }
 
     @Override
@@ -162,16 +160,6 @@ public class UserDbStorage implements UserStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_FROM_FRIENDS, parameters);
     }
 
-
-    private User makeUser(ResultSet rs) throws SQLException {
-        int id = rs.getInt("user_id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return new User(id, email, login, name, birthday);
-    }
-
     private MapSqlParameterSource getUserParameters(User user) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("email", user.getEmail());
@@ -187,6 +175,7 @@ public class UserDbStorage implements UserStorage {
         parameters.addValue("second_user_id", friendId);
         return parameters;
     }
+
     @Override
     public void deleteUserById(int userId) {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);

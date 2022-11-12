@@ -5,10 +5,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -30,7 +29,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Collection<Genre> findAllGenres() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> makeGenre(rs));
+                .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> Mapper.makeGenre(rs));
     }
 
     @Override
@@ -47,9 +46,4 @@ public class GenreDbStorage implements GenreStorage {
         }
     }
 
-    private Genre makeGenre(ResultSet rs) throws SQLException {
-        int id = rs.getInt("genre_id");
-        String name = rs.getString("genre_name");
-        return new Genre(id, name);
-    }
 }

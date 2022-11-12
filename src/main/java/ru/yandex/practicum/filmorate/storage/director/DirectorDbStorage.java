@@ -9,10 +9,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Director;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Collection<Director> findAllDirectors() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> makeDirector(rs));
+                .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> Mapper.makeDirector(rs));
     }
 
     @Override
@@ -81,9 +80,4 @@ public class DirectorDbStorage implements DirectorStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
     }
 
-    private Director makeDirector(ResultSet rs) throws SQLException {
-        int id = rs.getInt("director_id");
-        String name = rs.getString("director_name");
-        return new Director(id, name);
-    }
 }

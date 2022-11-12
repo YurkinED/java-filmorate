@@ -8,10 +8,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,19 +38,19 @@ public class ReviewDBStorage implements ReviewStorage {
     @Override
     public List<Review> findAllReviews() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_GET_ALL_REVIEWS, (rs, rowNum) -> makeReview(rs));
+                .query(SQL_QUERY_GET_ALL_REVIEWS, (rs, rowNum) -> Mapper.makeReview(rs));
     }
 
     @Override
     public List<Review> findReviewByFilmId(Integer filmId) {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_GET_REVIEWS_BY_FILM_ID, (rs, rowNum) -> makeReview(rs), filmId);
+                .query(SQL_QUERY_GET_REVIEWS_BY_FILM_ID, (rs, rowNum) -> Mapper.makeReview(rs), filmId);
     }
 
     @Override
     public Optional<Review> findReviewById(Integer id) {
         List<Review> reviews = namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_GET_REVIEW_BY_ID, (rs, rowNum) -> makeReview(rs), id);
+                .query(SQL_QUERY_GET_REVIEW_BY_ID, (rs, rowNum) -> Mapper.makeReview(rs), id);
         if (reviews.isEmpty()) {
             return Optional.empty();
         } else {
@@ -107,13 +106,5 @@ public class ReviewDBStorage implements ReviewStorage {
         return parameters;
     }
 
-    private Review makeReview(ResultSet rs) throws SQLException {
-        int id = rs.getInt("review_id");
-        String content = rs.getString("content");
-        boolean isPositive = rs.getBoolean("isPositive");
-        int useful = rs.getInt("useful");
-        int userId = rs.getInt("user_id");
-        int filmId = rs.getInt("film_id");
-        return new Review(id, content, isPositive, useful, userId, filmId);
-    }
+
 }
