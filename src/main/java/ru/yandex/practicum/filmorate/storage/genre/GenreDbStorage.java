@@ -1,15 +1,19 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_ALL_GENRES;
@@ -18,17 +22,13 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.S
 
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class GenreDbStorage implements GenreStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @Autowired
-    public GenreDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
-
     @Override
-    public Collection<Genre> findAllGenres() {
+    public List<Genre> findAllGenres() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
                 .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> makeGenre(rs));
     }
@@ -45,6 +45,21 @@ public class GenreDbStorage implements GenreStorage {
         } else {
             return Optional.empty();
         }
+    }
+
+
+    @Override
+    public List<Genre> makeGenreFromArray(String genres) throws SQLException {
+        List<Genre> genresList=new ArrayList<>();
+        try {
+            String[] rs = genres.split(";");
+            for(String genre:rs){
+                genresList.add(new Genre(Integer.parseInt(genre.split("#")[0]), genre.split("#")[1].strip()));
+            }
+        } catch (Exception ex){
+
+        }
+        return genresList;
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {

@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User findUserById(@PathVariable int userId) {
+    public User findUserById(@PathVariable @Positive int userId) {
         log.debug("Получен запрос Get /users/{}. Найти пользователя по userId {}.", userId, userId);
         return userService.findUserById(userId).orElseThrow(
                 () -> new InvalidIdException("К сожалению, пользователя с id " + userId + " нет."));
@@ -53,7 +54,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friends/common/{friendId}")
-    public Collection<User> getCommonFriends(@PathVariable int userId, @PathVariable int friendId) {
+    public Collection<User> getCommonFriends(@PathVariable @Positive int userId, @PathVariable @Positive int friendId) {
         log.debug("Получен запрос Get /users/{}/friends/common/{}. Найти общих друзей пользователей с userId {} и {}.",
                 userId, friendId, userId, friendId);
         return userService.showCommonFriends(userId, friendId);

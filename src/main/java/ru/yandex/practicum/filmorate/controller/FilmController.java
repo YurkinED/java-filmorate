@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.Collection;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
@@ -30,7 +29,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         log.debug("Получен запрос GET /films. Показать все фильмы");
         return filmService.findAllFilms();
     }

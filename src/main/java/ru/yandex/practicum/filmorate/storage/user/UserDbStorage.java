@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -25,19 +25,14 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*
 @Slf4j
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @Autowired
-    public UserDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-
-    }
-
     @Override
-    public Collection<User> findAllUsers() {
+    public List<User> findAllUsers() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> makeUser(rs));
     }
 
@@ -87,8 +82,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     public boolean checkUserExists(int userId) {
-        SqlRowSet likeRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_USER_EXISTS, userId);
-        if (likeRows.next()) {
+        SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_USER_EXISTS, userId);
+        if (userRows.next()) {
             return true;
         } else {
             return false;
@@ -113,7 +108,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> showUserFriendsId(int userId) {
+    public List<User> showUserFriendsId(int userId) {
         List<User> friendsList = new ArrayList<>();
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FRIENDS_BY_USER_ID, userId);
 
@@ -131,7 +126,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> showCommonFriends(int userId, int friendId) {
+    public List<User> showCommonFriends(int userId, int friendId) {
         findUserById(userId)
                 .orElseThrow(() -> new InvalidIdException("Нет пользователя с id " + userId));
         findUserById(friendId)
