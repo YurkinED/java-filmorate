@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,8 +23,10 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*
 @Repository
 @Primary
 @RequiredArgsConstructor
-public class FriendDbStorage implements  FriendStorage {
+public class FriendDbStorage implements FriendStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @Override
     public boolean checkFriendshipExists(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
@@ -44,13 +48,12 @@ public class FriendDbStorage implements  FriendStorage {
     public Collection<User> showUserFriendsId(int userId) {
         List<User> friendsList = new ArrayList<>();
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FRIENDS_BY_USER_ID, userId);
-String sql =
         while (userRows.next()) {
             int friendId = userRows.getInt("second_user_id");
 
             SqlRowSet friendRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, friendId);
             friendRows.first();
-            User user =  makeUser(friendRows);
+            User user = makeUserForFriends(friendRows);
 
             friendsList.add(user);
             log.info("В список друзей добавлен пользователь: {} {}", user.getId(), user.getName());
@@ -76,5 +79,14 @@ String sql =
         parameters.addValue("first_user_id", userId);
         parameters.addValue("second_user_id", friendId);
         return parameters;
+    }
+
+    private User makeUserForFriends(SqlRowSet rs) {
+        int id = rs.getInt("user_id");
+        String email = rs.getString("email");
+        String login = rs.getString("login");
+        String name = rs.getString("name");
+        LocalDate birthday = rs.getDate("birthday").toLocalDate();
+        return new User(id, email, login, name, birthday);
     }
 }
