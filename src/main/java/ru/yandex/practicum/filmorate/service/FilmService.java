@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
+import java.sql.SQLException;
 import java.util.*;
 
 
@@ -34,11 +35,11 @@ public class FilmService {
         this.feedStorage = feedStorage;
     }
 
-    public void addLikeToFilm(int filmId, int userId) {
+    public void addLikeToFilm(int filmId, int userId)  {
         userStorage.findUserById(userId).orElseThrow(
                 () -> new InvalidIdException("Пользователь с id" + userId + " не найден"));
         filmStorage.findFilmById(filmId).orElseThrow(
-                () -> new InvalidIdException("Фильм с id" + userId + " не найден"));
+                () -> new InvalidIdException("Фильм с id" + filmId + " не найден"));
         if (!filmStorage.checkLikeFilm(filmId, userId)) {
             filmStorage.likeFilmOrRemoveLike(filmId, userId, true);
             feedStorage.createFeed(userId, filmId, Feed.Event.LIKE, Feed.Operation.ADD);
@@ -62,7 +63,7 @@ public class FilmService {
         }
     }
 
-    public Collection<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
 

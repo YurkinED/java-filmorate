@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.director;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,27 +11,22 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Director;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_REMOVE_DIRECTOR;
 
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class DirectorDbStorage implements DirectorStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @Autowired
-    public DirectorDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
-
     @Override
-    public Collection<Director> findAllDirectors() {
+    public List<Director> findAllDirectors() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
                 .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> makeDirector(rs));
     }
@@ -79,6 +74,19 @@ public class DirectorDbStorage implements DirectorStorage {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("director_id", directorId);
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
+    }
+
+    @Override
+    public List<Director> makeDirectorFromArray(String directors) throws SQLException {
+        List<Director> directorsList = new ArrayList<>();
+        try {
+            String rs[]=directors.split(";");
+            for(String director:rs){
+                directorsList.add(new Director(Integer.parseInt(director.split("#")[0]),director.split("#")[1].strip()));
+            }
+        } catch (Exception ex){
+        }
+        return directorsList;
     }
 
     private Director makeDirector(ResultSet rs) throws SQLException {

@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 import ru.yandex.practicum.filmorate.validators.ValidationGroup;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +30,7 @@ public class ReviewController {
 
     @GetMapping
     List<Review> findAllOrByFilmIdReviews(
-            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
+            @RequestParam(value = "count", defaultValue = "10", required = false) @Positive Integer count,
             @RequestParam(value = "filmId", required = false) Integer filmId) {
         if (Objects.isNull(filmId)) {
             log.debug("Получен запрос GET /reviews?count={}. Показать {} отзывов", count, count);

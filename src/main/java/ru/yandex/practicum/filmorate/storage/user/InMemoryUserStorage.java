@@ -9,10 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -27,9 +24,9 @@ public class InMemoryUserStorage implements UserStorage {
         this.userValidator = userValidator;
     }
 
-    public Collection<User> findAllUsers() {
+    public List<User> findAllUsers() {
         log.debug("Получен запрос GET /users. Текущее количество пользователей: {}", users.size());
-        return users.values();
+        return new ArrayList<User>(users.values());
     }
 
     public Optional<User> findUserById(int userId) {
