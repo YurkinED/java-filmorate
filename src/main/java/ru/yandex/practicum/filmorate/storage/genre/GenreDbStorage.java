@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -30,7 +31,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public List<Genre> findAllGenres() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> makeGenre(rs));
+                .query(SQL_QUERY_TAKE_ALL_GENRES, (rs, rowNum) -> Mapper.makeGenre(rs));
     }
 
     @Override
@@ -48,23 +49,4 @@ public class GenreDbStorage implements GenreStorage {
     }
 
 
-    @Override
-    public List<Genre> makeGenreFromArray(String genres) throws SQLException {
-        List<Genre> genresList=new ArrayList<>();
-        try {
-            String[] rs = genres.split(";");
-            for(String genre:rs){
-                genresList.add(new Genre(Integer.parseInt(genre.split("#")[0]), genre.split("#")[1].strip()));
-            }
-        } catch (Exception ex){
-
-        }
-        return genresList;
-    }
-
-    private Genre makeGenre(ResultSet rs) throws SQLException {
-        int id = rs.getInt("genre_id");
-        String name = rs.getString("genre_name");
-        return new Genre(id, name);
-    }
 }

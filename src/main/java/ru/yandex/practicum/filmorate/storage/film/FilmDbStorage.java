@@ -10,11 +10,11 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
-import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -35,12 +35,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findAllFilms() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS,
-                (rs, rowNum) -> makeFilmFromRs(rs));
+                (rs, rowNum) -> Mapper.makeFilmFromRs(rs));
     }
 
     @Override
     public Optional<Film> findFilmById(int filmId) {
-        List<Film> films=namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID, (rs, rowNum) -> makeFilmFromRs(rs), filmId);
+        List<Film> films=namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID, (rs, rowNum) -> Mapper.makeFilmFromRs(rs), filmId);
         System.out.println(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID);
         if (films.size()==1){
             return Optional.of(films.get(0));
@@ -103,7 +103,7 @@ public class FilmDbStorage implements FilmStorage {
         directorStorage.findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
         return namedParameterJdbcTemplate.getJdbcTemplate().query(query,
-                (rs, rowNum) -> makeFilmFromRs(rs),directorId);
+                (rs, rowNum) -> Mapper.makeFilmFromRs(rs),directorId);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getRecommendations(int userId) {
         return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().query(
                 SQL_QUERY_TAKE_RECOMMENDED_FILMS,
-                (rowSet, rowNum) -> makeFilmFromRs(rowSet),
+                (rowSet, rowNum) -> Mapper.makeFilmFromRs(rowSet),
                 userId, userId, userId));
     }
 
@@ -161,49 +161,26 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> searchFilmsByTitle(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> Mapper.makeFilmFromRs(rs), queryParam);
     }
 
     @Override
     public List<Film> searchFilmsByDirector(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam);
+                query(SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> Mapper.makeFilmFromRs(rs), queryParam);
     }
 
     @Override
     public List<Film> searchFilmsByTitleAndDirector(String query) {
         String queryParam = "%" + query.toLowerCase() + "%";
         return namedParameterJdbcTemplate.getJdbcTemplate().
-                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
+                query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> Mapper.makeFilmFromRs(rs), queryParam, queryParam);
     }
 
 
 
-    private Film makeFilmFromRs(ResultSet rs)  {
-        try {
-            int id = rs.getInt("film_id");
-            String name = rs.getString("film_name");
-            String description = rs.getString("description");
-            LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-            long duration = rs.getLong("duration");
-            int mpaId = rs.getInt("mpa_id");
-            String mpaName = rs.getString("mpa_name");
-            Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-            film.setRating(rs.getInt("rating"));
-            for (Director director : directorStorage.makeDirectorFromArray(rs.getString("directors"))) {
-                film.addDirectorToFilm(director);
-            }
-            for (Genre genre : genreStorage.makeGenreFromArray(rs.getString("genres"))) {
-                film.addGenresToFilm(genre);
-            }
 
-            return film;
-        } catch (Exception ex){
-            log.error(ex.getMessage());
-            return null;
-        }
-    }
 
     private Film addGenreAndDirectorToFilm(Film film) {
         SqlRowSet genreRows = namedParameterJdbcTemplate

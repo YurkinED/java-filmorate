@@ -12,8 +12,6 @@ public interface GenreStorage {
 
     List<Genre> findAllGenres();
 
-    List<Genre> makeGenreFromArray(String genres) throws SQLException;
-
     Optional<Genre> findGenreById(int genreId);
 
 }

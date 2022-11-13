@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.Array;
@@ -28,7 +29,7 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public List<Director> findAllDirectors() {
         return namedParameterJdbcTemplate.getJdbcTemplate()
-                .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> makeDirector(rs));
+                .query(SQL_QUERY_TAKE_ALL_DIRECTORS, (rs, rowNum) -> Mapper.makeDirector(rs));
     }
 
     @Override
@@ -76,22 +77,6 @@ public class DirectorDbStorage implements DirectorStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
     }
 
-    @Override
-    public List<Director> makeDirectorFromArray(String directors) throws SQLException {
-        List<Director> directorsList = new ArrayList<>();
-        try {
-            String rs[]=directors.split(";");
-            for(String director:rs){
-                directorsList.add(new Director(Integer.parseInt(director.split("#")[0]),director.split("#")[1].strip()));
-            }
-        } catch (Exception ex){
-        }
-        return directorsList;
-    }
 
-    private Director makeDirector(ResultSet rs) throws SQLException {
-        int id = rs.getInt("director_id");
-        String name = rs.getString("director_name");
-        return new Director(id, name);
-    }
+
 }

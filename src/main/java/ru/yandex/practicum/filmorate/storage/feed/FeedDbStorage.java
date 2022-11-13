@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Feed;
 
 import java.sql.ResultSet;
@@ -22,7 +23,7 @@ public class FeedDbStorage implements FeedStorage {
     @Override
     public Collection<Feed> showUsersFeeds(int id) {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_SHOW_FEEDS_BY_USER_ID,
-                (rs, rowNum) -> makeFeed(id, rs), id);
+                (rs, rowNum) -> Mapper.makeFeed(id, rs), id);
     }
 
     @Override
@@ -38,12 +39,4 @@ public class FeedDbStorage implements FeedStorage {
                 Timestamp.valueOf(now).getTime());
     }
 
-    private Feed makeFeed(int id, ResultSet rs) throws SQLException {
-        return new Feed(rs.getInt("feed_id"),
-                id,
-                rs.getInt("entity_id"),
-                Feed.Event.valueOf(rs.getString("event_type")),
-                Feed.Operation.valueOf(rs.getString("operation")),
-                rs.getLong("creation_time"));
-    }
 }

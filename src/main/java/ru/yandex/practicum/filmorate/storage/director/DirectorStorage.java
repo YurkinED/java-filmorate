@@ -20,6 +20,4 @@ public interface DirectorStorage {
 
     void removeDirector(long directorId);
 
-    List<Director> makeDirectorFromArray(String directors) throws SQLException;
-
 }

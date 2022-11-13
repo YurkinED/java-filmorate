@@ -7,10 +7,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +44,7 @@ public class FriendDbStorage implements FriendStorage {
     }
 
     @Override
-    public Collection<User> showUserFriendsId(int userId) {
+    public List<User> showUserFriendsId(int userId) {
         List<User> friendsList = new ArrayList<>();
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FRIENDS_BY_USER_ID, userId);
         while (userRows.next()) {
@@ -53,7 +52,7 @@ public class FriendDbStorage implements FriendStorage {
 
             SqlRowSet friendRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, friendId);
             friendRows.first();
-            User user = makeUserForFriends(friendRows);
+            User user = Mapper.makeUserForFriends(friendRows);
 
             friendsList.add(user);
             log.info("В список друзей добавлен пользователь: {} {}", user.getId(), user.getName());
@@ -62,7 +61,7 @@ public class FriendDbStorage implements FriendStorage {
     }
 
     @Override
-    public Collection<User> showCommonFriends(int userId, int friendId) {
+    public List<User> showCommonFriends(int userId, int friendId) {
         return showUserFriendsId(userId).stream()
                 .filter(id -> showUserFriendsId(friendId).contains(id))
                 .collect(Collectors.toList());
@@ -81,12 +80,5 @@ public class FriendDbStorage implements FriendStorage {
         return parameters;
     }
 
-    private User makeUserForFriends(SqlRowSet rs) {
-        int id = rs.getInt("user_id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return new User(id, email, login, name, birthday);
-    }
+
 }

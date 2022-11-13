@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
@@ -24,7 +25,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Collection<Mpa> findAllMpa() {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_MPA, (rs, rowNum) -> makeMpa(rs));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_MPA, (rs, rowNum) -> Mapper.makeMpa(rs));
     }
 
     @Override
@@ -41,9 +42,4 @@ public class MpaDbStorage implements MpaStorage {
         }
     }
 
-    private Mpa makeMpa(ResultSet rs) throws SQLException {
-        int id = rs.getInt("mpa_id");
-        String name = rs.getString("mpa_name");
-        return new Mpa(id, name);
-    }
 }
