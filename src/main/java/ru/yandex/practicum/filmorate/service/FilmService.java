@@ -83,7 +83,7 @@ public class FilmService {
     }
 
     public List<Film> showDirectorsFilmsAndSort(int directorId, String query) {
-        return filmStorage.findFilmsByDirectorAndSort(directorId, query);
+        return directorStorage.findFilmsByDirectorAndSort(directorId, query);
     }
 
     public List<Film> showCommonLikedFilms(int userId, int friendId) {

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +26,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final DirectorStorage directorStorage;
 
     @Override
     public Collection<Film> findAllFilms() {
@@ -100,20 +98,6 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             namedParameterJdbcTemplate.update(SQL_QUERY_DELETE_LIKE, parameters);
         }
-    }
-
-    @Override
-    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
-        directorStorage.findDirectorById(directorId)
-                .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
-        ArrayList<Film> films = new ArrayList<>();
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(query,
-                        directorId);
-        while (filmRows.next()) {
-            films.add(makeFilm(filmRows));
-        }
-        return films;
     }
 
     @Override

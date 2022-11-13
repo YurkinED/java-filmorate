@@ -20,8 +20,6 @@ public interface FilmStorage {
 
     void likeFilmOrRemoveLike(int filmId, int userId, boolean flag);
 
-    List<Film> findFilmsByDirectorAndSort(int directorId, String query);
-
     List<Film> commonLikedFilms(int userId, int friendId);
 
     void deleteFilmById(int filmId);

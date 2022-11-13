@@ -45,11 +45,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
-        return null;
-    }
-
-    @Override
     public List<Film> commonLikedFilms(int userId, int friendId) {
         return null;
     }
