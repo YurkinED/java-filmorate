@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -13,7 +14,6 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
@@ -21,7 +21,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 
 @Slf4j
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -50,7 +49,8 @@ public class FilmDbStorage implements FilmStorage {
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(id);
         log.error("Film created");
-        installFilmGenresAndDirectors(film);
+        saveFilmGenres(film);
+        saveFilmDirectors(film);
         log.error("Genres added created");
         return findFilmById(film.getId()).orElseThrow();
     }
@@ -63,7 +63,8 @@ public class FilmDbStorage implements FilmStorage {
         MapSqlParameterSource parameters = getFilmParameters(film);
         parameters.addValue("film_id", filmId);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_FILM, parameters);
-        installFilmGenresAndDirectors(film);
+        saveFilmGenres(film);
+        saveFilmDirectors(film);
         return findFilmById(film.getId()).orElseThrow();
     }
 
@@ -125,15 +126,11 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         ArrayList<Film> films = new ArrayList<>();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-
         parameters.addValue("genre_id", genreId);
         parameters.addValue("year", year);
         parameters.addValue("limit", limit);
-        SqlRowSet filmRows = namedParameterJdbcTemplate.queryForRowSet(SQL_QUERY_FIND_FILM_FILTER, parameters);
-        while (filmRows.next()) {
-            films.add(makeFilm(filmRows));
-        }
-        return films;
+        return new ArrayList<>(namedParameterJdbcTemplate.getJdbcTemplate().
+                query(SQL_QUERY_FIND_FILM_FILTER, (rs, rowNum) -> Mapper.makeFilmFromRs(rs), genreId, year, limit));
     }
 
     @Override
@@ -166,60 +163,41 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
-
-
-
-    private Film addGenreAndDirectorToFilm(Film film) {
-        SqlRowSet genreRows = namedParameterJdbcTemplate
-                .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILMS_GENRE_AND_DIRECTOR_BY_ID, film.getId());
-        Set<Genre> genres = new TreeSet<>(Comparator.comparingLong(Genre::getId));
-        while (genreRows.next()) {
-            int genreId = genreRows.getInt("genre_id");
-            String genreName = genreRows.getString("genre_name");
-            int directorId = genreRows.getInt("director_id");
-            String directorName = genreRows.getString("director_name");
-            if (genreId != 0 && genreName != null) {
-                genres.add(new Genre(genreId, genreName));
-            }
-            if (directorId != 0 && directorName != null) {
-                film.addDirectorToFilm(new Director(directorId, directorName));
-            }
-        }
-        film.setGenres(genres);
-        return film;
-    }
-
-    private Film installFilmGenresAndDirectors(Film film) {
+    private void saveFilmGenres(Film film) {
         int filmId = film.getId();
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
-        MapSqlParameterSource parameters;
-
         Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
-            for (Genre element : film.getGenres()) {
-                long genreId = element.getId();
-                parameters = new MapSqlParameterSource();
-                parameters.addValue("film_id", filmId);
-                parameters.addValue("genre_id", genreId);
-                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_GENRE, parameters);
+            Map<String, Object>[] batchOfInputs = new HashMap[film.getGenres().size()];
+            int count = 0;
+            for (Genre genre : film.getGenres()) {
+                Map<String, Object> map = new HashMap();
+                map.put("film_id", filmId);
+                map.put("genre_id", genre.getId());
+                batchOfInputs[count++] = map;
+                System.out.println(batchOfInputs);
             }
+            namedParameterJdbcTemplate.batchUpdate(SQL_QUERY_INSERT_FILMS_GENRE, batchOfInputs);
         }
 
+    }
+
+    private void saveFilmDirectors(Film film) {
+        int filmId = film.getId();
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
         Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
-            for (Director element : film.getDirectors()) {
-                long directorId = element.getId();
-                parameters = new MapSqlParameterSource();
-                parameters.addValue("film_id", filmId);
-                parameters.addValue("director_id", directorId);
-                namedParameterJdbcTemplate.update(SQL_QUERY_INSERT_FILMS_DIRECTOR, parameters);
+            Map<String,Object>[] batchOfInputs = new HashMap[film.getDirectors().size()];
+            int count = 0;
+            for(Director director : film.getDirectors()){
+                Map<String,Object> map = new HashMap();
+                map.put("film_id", filmId);
+                map.put("director_id", director.getId());
+                batchOfInputs[count++]= map;
+                System.out.println(batchOfInputs);
             }
+            namedParameterJdbcTemplate.batchUpdate(SQL_QUERY_INSERT_FILMS_DIRECTOR, batchOfInputs);
         }
-
-        film.clearGenres();
-        film.clearDirectors();
-        return film;
     }
 
     private MapSqlParameterSource getFilmParameters(Film film) {
@@ -239,18 +217,7 @@ public class FilmDbStorage implements FilmStorage {
         return parameters;
     }
 
-    private Film makeFilm(SqlRowSet filmRows) {
-        int id = filmRows.getInt("film_id");
-        String name = filmRows.getString("film_name");
-        String description = filmRows.getString("description");
-        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
-        long duration = filmRows.getLong("duration");
-        int mpaId = filmRows.getInt("mpa_id");
-        String mpaName = filmRows.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(filmRows.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
-    }
+
 
 
 }

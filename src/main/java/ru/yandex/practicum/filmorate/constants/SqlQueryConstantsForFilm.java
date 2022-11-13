@@ -192,7 +192,7 @@ public class SqlQueryConstantsForFilm {
 
     public static final String SQL_QUERY_DELETE_FILMS_DIRECTORS = "DELETE FROM films_directors WHERE film_id = ?";
     public static final String SQL_QUERY_FIND_FILM_FILTER= "" +
-            "SELECT DISTINCT                                            \n" +
+            "SELECT  DISTINCT                                   \n" +
             "       f.film_id,                                  \n" +
             "       f.film_name,                                \n" +
             "       f.description,                              \n" +
@@ -200,16 +200,29 @@ public class SqlQueryConstantsForFilm {
             "       f.duration,                                 \n" +
             "       f.mpa_id,                                   \n" +
             "       m.mpa_name,                                 \n" +
-            "       (SELECT COUNT(film_id) AS likes FROM likes  \n" +
-            "       WHERE film_id = f.film_id) AS rating        \n" +
+            "       (SELECT COUNT(film_id) AS likes FROM likes  WHERE film_id = f.film_id) AS rating,        \n" +
+            "        g.genres,                                  \n" +
+            "        d.directors                                \n" +
             "FROM films AS f                                    \n" +
             "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id          \n" +
             "LEFT JOIN films_genres fg on f.film_id = fg.film_id\n" +
-            "JOIN (select CAST(:genre_id as INTEGER) as genre_id, CAST(:year as INTEGER) as year_id FROM dual) flt on 1=1  \n" +
+            " left join (                                       \n" +
+            "           SELECT fg.film_id,                      \n" +
+            "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres\n" +
+            "           FROM films_genres fg                    \n" +
+            "           JOIN genres g ON fg.genre_id=g.genre_id \n" +
+            "           group by fg.film_id) g on f.film_id=g.film_id\n" +
+            " left join (                                       \n" +
+            "           SELECT fd.film_id,                      \n" +
+            "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors\n" +
+            "           FROM films_directors fd                 \n" +
+            "           JOIN directors d ON fd.director_id=d.director_id\n" +
+            "           group by fd.film_id) d on f.film_id=d.film_id   \n" +
+            "JOIN (select CAST(?1 as INTEGER) as genre_id, CAST(?2 as INTEGER) as year_id FROM dual) flt on 1=1  \n" +
             "where (EXTRACT(YEAR FROM f.release_date) = flt.year_id  or flt.year_id='10000') \n" +
             "and  (fg.genre_id = flt.genre_id or flt.genre_id=0)\n" +
             "ORDER BY rating DESC                               \n" +
-            "LIMIT :limit                                       \n";
+            "LIMIT ?3                                       \n";
 
     public static final String SQL_QUERY_TAKE_COMMON_FILMS =
             " SELECT " +

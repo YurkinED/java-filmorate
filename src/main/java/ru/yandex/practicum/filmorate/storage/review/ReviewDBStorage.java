@@ -20,7 +20,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForReview
 
 @Repository
 @RequiredArgsConstructor
-@Primary
 public class ReviewDBStorage implements ReviewStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

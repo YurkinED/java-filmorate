@@ -23,7 +23,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*
 
 @Slf4j
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
