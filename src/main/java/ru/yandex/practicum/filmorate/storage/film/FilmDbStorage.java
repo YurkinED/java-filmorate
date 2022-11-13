@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -24,20 +24,28 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @Slf4j
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DirectorStorage directorStorage;
 
-    @Autowired
-    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorStorage directorStorage) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.directorStorage = directorStorage;
-    }
+    private final GenreStorage genreStorage;
+
 
     @Override
     public List<Film> findAllFilms() {
         return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS,
                 (rs, rowNum) -> makeFilmFromRs(rs));
+    }
+
+    @Override
+    public Optional<Film> findFilmById(int filmId) {
+        List<Film> films=namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID, (rs, rowNum) -> makeFilmFromRs(rs), filmId);
+        System.out.println(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID);
+        if (films.size()==1){
+            return Optional.of(films.get(0));
+        }
+            return Optional.empty();
     }
 
     @Override
@@ -47,7 +55,10 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_CREATE_FILM, parameters, keyHolder, new String[]{"film_id"});
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(id);
-        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
+        log.error("Film created");
+        installFilmGenresAndDirectors(film);
+        log.error("Genres added created");
+        return findFilmById(film.getId()).orElseThrow();
     }
 
     @Override
@@ -58,31 +69,11 @@ public class FilmDbStorage implements FilmStorage {
         MapSqlParameterSource parameters = getFilmParameters(film);
         parameters.addValue("film_id", filmId);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_FILM, parameters);
-        return addGenreAndDirectorToFilm(installFilmGenresAndDirectors(film));
+        installFilmGenresAndDirectors(film);
+        return findFilmById(film.getId()).orElseThrow();
     }
 
-    @Override
-    public Optional<Film> findFilmById(int filmId) {
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID,
-                        filmId);
-        if (filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("film_id"),
-                    filmRows.getString("film_name"),
-                    filmRows.getString("description"),
-                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
-                    filmRows.getLong("duration"),
-                    new Mpa(
-                            filmRows.getInt("mpa_id"),
-                            filmRows.getString("mpa_name"))
-            );
-            film.setRating(filmRows.getInt("rating"));
-            return Optional.of(addGenreAndDirectorToFilm(film));
-        } else {
-            return Optional.empty();
-        }
-    }
+
 
     @Override
     public boolean checkLikeFilm(int filmId, int userId) {
@@ -111,14 +102,8 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
         directorStorage.findDirectorById(directorId)
                 .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
-        ArrayList<Film> films = new ArrayList<>();
-        SqlRowSet filmRows =
-                namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(query,
-                        directorId);
-        while (filmRows.next()) {
-            films.add(makeFilm(filmRows));
-        }
-        return films;
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(query,
+                (rs, rowNum) -> makeFilmFromRs(rs),directorId);
     }
 
     @Override
@@ -193,17 +178,31 @@ public class FilmDbStorage implements FilmStorage {
                 query(SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR, (rs, rowNum) -> makeFilmFromRs(rs), queryParam, queryParam);
     }
 
-    private Film makeFilmFromRs(ResultSet rs) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("film_name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration");
-        int mpaId = rs.getInt("mpa_id");
-        String mpaName = rs.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(rs.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
+
+
+    private Film makeFilmFromRs(ResultSet rs)  {
+        try {
+            int id = rs.getInt("film_id");
+            String name = rs.getString("film_name");
+            String description = rs.getString("description");
+            LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+            long duration = rs.getLong("duration");
+            int mpaId = rs.getInt("mpa_id");
+            String mpaName = rs.getString("mpa_name");
+            Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+            film.setRating(rs.getInt("rating"));
+            for (Director director : directorStorage.makeDirectorFromArray(rs.getString("directors"))) {
+                film.addDirectorToFilm(director);
+            }
+            for (Genre genre : genreStorage.makeGenreFromArray(rs.getString("genres"))) {
+                film.addGenresToFilm(genre);
+            }
+
+            return film;
+        } catch (Exception ex){
+            log.error(ex.getMessage());
+            return null;
+        }
     }
 
     private Film addGenreAndDirectorToFilm(Film film) {

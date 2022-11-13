@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,7 +18,7 @@ public class DirectorService {
         this.directorStorage = directorStorage;
     }
 
-    public Collection<Director> findAllDirectors() {
+    public List<Director> findAllDirectors() {
         return directorStorage.findAllDirectors();
     }
 

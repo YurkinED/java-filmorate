@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -17,14 +17,10 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.S
 
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    @Autowired
-    public MpaDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
 
     @Override
     public Collection<Mpa> findAllMpa() {

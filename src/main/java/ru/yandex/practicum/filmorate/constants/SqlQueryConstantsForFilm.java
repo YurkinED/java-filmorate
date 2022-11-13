@@ -11,20 +11,91 @@ public class SqlQueryConstantsForFilm {
     public static final String SQL_QUERY_CREATE_DIRECTOR = "INSERT INTO directors (director_name) " +
             "VALUES (:director_name)";
 
-    public static final String SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS = "SELECT f.film_id, f.film_name, f.description, " +
-            "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-            "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
-            "ORDER BY rating DESC";
-    public static final String SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING = "SELECT f.film_id, f.film_name, " +
-            "f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, fd.director_id, (SELECT COUNT(film_id) " +
-            "AS likes FROM likes WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON " +
-            "f.mpa_id = m.mpa_id LEFT JOIN films_directors fd on f.film_id = fd.film_id WHERE director_id = ? " +
+    public static final String SQL_QUERY_TAKE_ALL_FILMS_AND_RATINGS = "" +
+            "SELECT " +
+            "f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.mpa_name, " +
+            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+            "g.genres, " +
+            "d.directors " +
+            "FROM films AS f " +
+            "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            " left join (" +
+            "           SELECT fg.film_id," +
+            "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+            "           FROM films_genres fg" +
+            "           JOIN genres g ON fg.genre_id=g.genre_id" +
+            "           group by fg.film_id) g on f.film_id=g.film_id " +
+            " left join (" +
+            "           SELECT fd.film_id," +
+            "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+            "           FROM films_directors fd" +
+            "           JOIN directors d ON fd.director_id=d.director_id" +
+            "           group by fd.film_id) d on f.film_id=d.film_id " +
             "ORDER BY rating DESC";
 
-    public static final String SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR = "SELECT f.film_id, f.film_name, " +
-            "f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, fd.director_id, (SELECT COUNT(film_id) " +
-            "AS likes FROM likes WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON " +
-            "f.mpa_id = m.mpa_id LEFT JOIN films_directors fd on f.film_id = fd.film_id WHERE director_id = ? " +
+    public static final String SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_RATING =
+            "SELECT " +
+                    "f.film_id, " +
+                    "f.film_name, " +
+                    "f.description, " +
+                    "f.release_date, " +
+                    "f.duration, " +
+                    "f.mpa_id, " +
+                    "m.mpa_name, " +
+                    "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+                    "g.genres, " +
+                    "d.directors " +
+                    "FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    " LEFT JOIN films_directors fd on f.film_id = fd.film_id " +
+                    " left join (" +
+                    "           SELECT fg.film_id," +
+                    "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+                    "           FROM films_genres fg" +
+                    "           JOIN genres g ON fg.genre_id=g.genre_id" +
+                    "           group by fg.film_id) g on f.film_id=g.film_id" +
+                    " left join (" +
+                    "           SELECT fd.film_id," +
+                    "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+                    "           FROM films_directors fd" +
+                    "           JOIN directors d ON fd.director_id=d.director_id" +
+                    "           group by fd.film_id) d on f.film_id=d.film_id " +
+                    "WHERE director_id = ? " +
+                    "ORDER BY rating DESC";
+
+    public static final String SQL_QUERY_TAKE_DIRECTOR_FILM_AND_SORT_BY_YEAR = "" +
+            "SELECT " +
+            "f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.mpa_name, " +
+            "fd.director_id, " +
+            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+            "g.genres, " +
+            "d.directors " +
+            "FROM films AS f " +
+            " LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            " left join (" +
+            "           SELECT fg.film_id," +
+            "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+            "           FROM films_genres fg" +
+            "           JOIN genres g ON fg.genre_id=g.genre_id" +
+            "           group by fg.film_id) g on f.film_id=g.film_id" +
+            " left join (" +
+            "           SELECT fd.film_id," +
+            "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+            "           FROM films_directors fd" +
+            "           JOIN directors d ON fd.director_id=d.director_id" +
+            "           group by fd.film_id) d on f.film_id=d.film_id " +
+            "LEFT JOIN films_directors fd on f.film_id = fd.film_id WHERE director_id = ? " +
             "ORDER BY release_date";
 
     public static final String SQL_QUERY_INSERT_FILMS_GENRE = "INSERT INTO films_genres (film_id, genre_id) " +
@@ -49,10 +120,32 @@ public class SqlQueryConstantsForFilm {
 
     public static final String SQL_QUERY_TAKE_MPA_BY_ID = "SELECT mpa_id, mpa_name FROM mpa WHERE mpa_id = ?";
 
-    public static final String SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID = "SELECT f.film_id, f.film_name, f.description, " +
-            "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-            "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON " +
-            "f.mpa_id= m.mpa_id WHERE film_id = ?";
+    public static final String SQL_QUERY_TAKE_FILM_RATING_AND_MPA_BY_ID = "" +
+            "SELECT " +
+            "f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.mpa_name, " +
+            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+            "g.genres, " +
+            "d.directors " +
+            "FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            " left join (" +
+            "           SELECT fg.film_id," +
+            "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+            "           FROM films_genres fg" +
+            "           JOIN genres g ON fg.genre_id=g.genre_id" +
+            "           group by fg.film_id) g on f.film_id=g.film_id" +
+            " left join (" +
+            "           SELECT fd.film_id," +
+            "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+            "           FROM films_directors fd" +
+            "           JOIN directors d ON fd.director_id=d.director_id" +
+            "           group by fd.film_id) d on f.film_id=d.film_id " +
+            "WHERE f.film_id = ?";
 
     public static final String SQL_QUERY_LIKE_FILM = "INSERT INTO likes (film_id, user_id) VALUES (:film_id, :user_id)";
 
@@ -72,10 +165,24 @@ public class SqlQueryConstantsForFilm {
             "f.duration, " +
             "f.mpa_id, " +
             "m.mpa_name, " +
-            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating " +
+            "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+            "g.genres, " +
+            "d.directors " +
             "FROM likes AS l " +
             "JOIN films AS f ON f.film_id = l.film_id " +
             "JOIN mpa AS m ON m.mpa_id =f.mpa_id " +
+            " left join (" +
+            "           SELECT fg.film_id," +
+            "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+            "           FROM films_genres fg" +
+            "           JOIN genres g ON fg.genre_id=g.genre_id" +
+            "           group by fg.film_id) g on f.film_id=g.film_id" +
+            " left join (" +
+            "           SELECT fd.film_id," +
+            "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+            "           FROM films_directors fd" +
+            "           JOIN directors d ON fd.director_id=d.director_id" +
+            "           group by fd.film_id) d on f.film_id=d.film_id " +
             "WHERE l.film_id NOT IN(SELECT film_id FROM likes WHERE user_id = ?) " +
             "AND l.user_id IN(SELECT user_id FROM likes " +
             "WHERE film_id IN(SELECT film_id FROM likes WHERE user_id = ?) " +
@@ -113,11 +220,25 @@ public class SqlQueryConstantsForFilm {
                     "        f.release_date, " +
                     "        f.duration, " +
                     "        f.mpa_id, " +
-                    "        m.mpa_name " +
+                    "        m.mpa_name, " +
+                    "        g.genres, " +
+                    "        d.directors " +
                     " FROM films AS f " +
                     " LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
                     " LEFT JOIN (SELECT film_id, count(*) as cnt " +
                     "            FROM likes group by film_id) AS likes_data ON f.film_id = likes_data.film_id " +
+                    " left join (" +
+                    "           SELECT fg.film_id," +
+                    "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+                    "           FROM films_genres fg" +
+                    "           JOIN genres g ON fg.genre_id=g.genre_id" +
+                    "           group by fg.film_id) g on f.film_id=g.film_id" +
+                    " left join (" +
+                    "           SELECT fd.film_id," +
+                    "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+                    "           FROM films_directors fd" +
+                    "           JOIN directors d ON fd.director_id=d.director_id" +
+                    "           group by fd.film_id) d on f.film_id=d.film_id " +
                     " where f.film_id in       " +
                     " (                        " +
                     "   SELECT t1.film_id " +
@@ -127,27 +248,82 @@ public class SqlQueryConstantsForFilm {
                     "   JOIN (SELECT film_id " +
                     "         FROM likes where user_id=?) AS t2 on t1.film_id=t2.film_id " +
                     " ) ORDER BY likes_data.cnt DESC NULLS LAST";
-
     public static final String SQL_QUERY_SEARCH_FILMS_BY_TITLE =
-            "SELECT f.film_id, f.film_name, f.description, " +
-                    "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            "SELECT f.film_id, " +
+                    "f.film_name, " +
+                    "f.description, " +
+                    "f.release_date, " +
+                    "f.duration, " +
+                    "f.mpa_id, " +
+                    "m.mpa_name, " +
+                    "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+                    "g.genres, " +
+                    "d.directors " +
+                    "FROM films AS f " +
+                    "LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    " left join (" +
+                    "           SELECT fg.film_id," +
+                    "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+                    "           FROM films_genres fg" +
+                    "           JOIN genres g ON fg.genre_id=g.genre_id" +
+                    "           group by fg.film_id) g on f.film_id=g.film_id" +
+                    " left join (" +
+                    "           SELECT fd.film_id," +
+                    "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+                    "           FROM films_directors fd" +
+                    "           JOIN directors d ON fd.director_id=d.director_id" +
+                    "           group by fd.film_id) d on f.film_id=d.film_id " +
                     "WHERE LOWER(f.film_name) LIKE ? ORDER BY rating DESC";
 
     public static final String SQL_QUERY_SEARCH_FILMS_BY_DIRECTOR =
-            "SELECT f.film_id, f.film_name, f.description, " +
-                    "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+            "SELECT f.film_id, " +
+                    "f.film_name, " +
+                    "f.description, " +
+                    "f.release_date, " +
+                    "f.duration, " +
+                    "f.mpa_id, " +
+                    "m.mpa_name, " +
+                    "(SELECT COUNT(film_id) AS likes FROM likes WHERE film_id = f.film_id) AS rating, " +
+                    "g.genres, " +
+                    "d.directors " +
+                    "FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
                     "INNER JOIN films_directors AS fd ON f.film_id = fd.film_id " +
                     "INNER JOIN directors AS d ON fd.director_id = d.director_id " +
+                    " left join (" +
+                    "           SELECT fg.film_id," +
+                    "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+                    "           FROM films_genres fg" +
+                    "           JOIN genres g ON fg.genre_id=g.genre_id" +
+                    "           group by fg.film_id) g on f.film_id=g.film_id" +
+                    " left join (" +
+                    "           SELECT fd.film_id," +
+                    "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+                    "           FROM films_directors fd" +
+                    "           JOIN directors d ON fd.director_id=d.director_id" +
+                    "           group by fd.film_id) d on f.film_id=d.film_id " +
                     "WHERE LOWER(d.director_name) LIKE ? ORDER BY rating DESC";
 
     public static final String SQL_QUERY_SEARCH_FILMS_BY_TITLE_AND_DIRECTOR =
             "SELECT f.film_id, f.film_name, f.description, " +
                     "f.release_date, f.duration, f.mpa_id, m.mpa_name, (SELECT COUNT(film_id) AS likes FROM likes " +
-                    "WHERE film_id = f.film_id) AS rating FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                    "WHERE film_id = f.film_id) AS rating, " +
+                    "g.genres, " +
+                    "d.directors " +
+                    "FROM films AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
                     "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id " +
                     "LEFT JOIN directors AS d ON fd.director_id = d.director_id " +
+                    " left join (" +
+                    "           SELECT fg.film_id," +
+                    "                  LISTAGG(g.genre_id||'#'||g.genre_name,';')  as genres" +
+                    "           FROM films_genres fg" +
+                    "           JOIN genres g ON fg.genre_id=g.genre_id" +
+                    "           group by fg.film_id) g on f.film_id=g.film_id" +
+                    " left join (" +
+                    "           SELECT fd.film_id," +
+                    "                 LISTAGG(d.director_id||'#'||d.director_name,';')  as directors" +
+                    "           FROM films_directors fd" +
+                    "           JOIN directors d ON fd.director_id=d.director_id" +
+                    "           group by fd.film_id) d on f.film_id=d.film_id " +
                     "WHERE LOWER(d.director_name) LIKE ? OR LOWER(f.film_name) LIKE ? ORDER BY rating DESC";
 }
 
