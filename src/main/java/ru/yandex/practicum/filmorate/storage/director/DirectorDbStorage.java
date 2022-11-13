@@ -19,7 +19,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.SQL_QUERY_REMOVE_DIRECTOR;
 
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class DirectorDbStorage implements DirectorStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

@@ -15,7 +15,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.S
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_MPA_BY_ID;
 
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
 

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,7 +21,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 
 @Slf4j
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -49,7 +49,8 @@ public class FilmDbStorage implements FilmStorage {
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(id);
         log.error("Film created");
-        saveFilmGenresAndDirectors(film);
+        saveFilmGenres(film);
+        saveFilmDirectors(film);
         log.error("Genres added created");
         return findFilmById(film.getId()).orElseThrow();
     }
@@ -62,7 +63,8 @@ public class FilmDbStorage implements FilmStorage {
         MapSqlParameterSource parameters = getFilmParameters(film);
         parameters.addValue("film_id", filmId);
         namedParameterJdbcTemplate.update(SQL_QUERY_UPDATE_FILM, parameters);
-        saveFilmGenresAndDirectors(film);
+        saveFilmGenres(film);
+        saveFilmDirectors(film);
         return findFilmById(film.getId()).orElseThrow();
     }
 
@@ -161,27 +163,28 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
-    private Film saveFilmGenresAndDirectors(Film film) {
+    private void saveFilmGenres(Film film) {
         int filmId = film.getId();
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_GENRE, filmId);
-        MapSqlParameterSource parameters;
-
         Set<Genre> genres = film.getGenres();
         if (genres.size() > 0) {
-
-            Map<String,Object>[] batchOfInputs = new HashMap[film.getGenres().size()];
+            Map<String, Object>[] batchOfInputs = new HashMap[film.getGenres().size()];
             int count = 0;
-            for(Genre genre : film.getGenres()){
-                Map<String,Object> map = new HashMap();
+            for (Genre genre : film.getGenres()) {
+                Map<String, Object> map = new HashMap();
                 map.put("film_id", filmId);
                 map.put("genre_id", genre.getId());
-                batchOfInputs[count++]= map;
+                batchOfInputs[count++] = map;
                 System.out.println(batchOfInputs);
             }
             namedParameterJdbcTemplate.batchUpdate(SQL_QUERY_INSERT_FILMS_GENRE, batchOfInputs);
         }
-        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
 
+    }
+
+    private void saveFilmDirectors(Film film) {
+        int filmId = film.getId();
+        namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_FILMS_DIRECTORS, filmId);
         Set<Director> directors = film.getDirectors();
         if (directors.size() > 0) {
             Map<String,Object>[] batchOfInputs = new HashMap[film.getDirectors().size()];
@@ -195,10 +198,6 @@ public class FilmDbStorage implements FilmStorage {
             }
             namedParameterJdbcTemplate.batchUpdate(SQL_QUERY_INSERT_FILMS_DIRECTOR, batchOfInputs);
         }
-
-        film.clearGenres();
-        film.clearDirectors();
-        return film;
     }
 
     private MapSqlParameterSource getFilmParameters(Film film) {
