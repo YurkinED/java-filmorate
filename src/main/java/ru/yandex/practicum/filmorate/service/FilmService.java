@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
@@ -23,8 +23,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmService {
 
-    private final FilmDbStorage filmStorage;
-    private final UserDbStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private final FeedStorage feedStorage;
     private final DirectorStorage directorStorage;
     private final FilmValidator filmValidator;
