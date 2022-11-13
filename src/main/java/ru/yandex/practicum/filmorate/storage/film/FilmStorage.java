@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import javax.validation.Valid;
-import java.sql.SQLException;
-import java.util.Collection;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +18,6 @@ public interface FilmStorage {
     boolean checkLikeFilm(int filmId, int userId);
 
     void likeFilmOrRemoveLike(int filmId, int userId, boolean flag);
-
-    List<Film> findFilmsByDirectorAndSort(int directorId, String query);
 
     List<Film> commonLikedFilms(int userId, int friendId);
 

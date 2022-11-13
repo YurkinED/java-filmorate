@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 
@@ -74,6 +75,12 @@ public class DirectorDbStorage implements DirectorStorage {
         namedParameterJdbcTemplate.update(SQL_QUERY_REMOVE_DIRECTOR, parameters);
     }
 
-
+    @Override
+    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
+        findDirectorById(directorId)
+                .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(query,
+                (rs, rowNum) -> Mapper.makeFilmFromRs(rs),directorId);
+    }
 
 }

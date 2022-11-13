@@ -2,9 +2,6 @@ package ru.yandex.practicum.filmorate.storage.genre;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.Array;
-import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
