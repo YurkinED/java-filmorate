@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,12 +10,12 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;
@@ -24,15 +24,10 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @Slf4j
 @Component
 @Primary
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DirectorStorage directorStorage;
-
-    @Autowired
-    public FilmDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate, DirectorStorage directorStorage) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.directorStorage = directorStorage;
-    }
 
     @Override
     public Collection<Film> findAllFilms() {
@@ -143,16 +138,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film makeFilm(SqlRowSet filmRows) {
-        int id = filmRows.getInt("film_id");
-        String name = filmRows.getString("film_name");
-        String description = filmRows.getString("description");
-        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
-        long duration = filmRows.getLong("duration");
-        int mpaId = filmRows.getInt("mpa_id");
-        String mpaName = filmRows.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(filmRows.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
+        return addGenreAndDirectorToFilm(Mapper.makeFilm(filmRows));
     }
 
     @Override
@@ -205,16 +191,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film makeFilmFromRs(ResultSet rs) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("film_name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration");
-        int mpaId = rs.getInt("mpa_id");
-        String mpaName = rs.getString("mpa_name");
-        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
-        film.setRating(rs.getInt("rating"));
-        return addGenreAndDirectorToFilm(film);
+        return addGenreAndDirectorToFilm(Mapper.makeFilmFromRs(rs));
     }
 
     private Film addGenreAndDirectorToFilm(Film film) {

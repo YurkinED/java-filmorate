@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.enums.SearchingParts;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.filmExceptions.BadSearchQueryExc
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LikesException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
@@ -19,20 +20,15 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
     private final FeedStorage feedStorage;
+    private final DirectorStorage directorStorage;
     private final FilmValidator filmValidator;
 
-    @Autowired
-    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, FilmValidator filmValidator, FeedStorage feedStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.filmValidator = filmValidator;
-        this.feedStorage = feedStorage;
-    }
 
     public void addLikeToFilm(int filmId, int userId) {
         userStorage.findUserById(userId).orElseThrow(
@@ -100,7 +96,7 @@ public class FilmService {
 
     public List<Film> showMostLikedFilmsFilter(Integer limit, Integer genreId, Integer year) {
         return filmStorage.showMostLikedFilmsFilter(limit, genreId, year);
-}
+    }
 
     public List<Film> searchFilms(String query, List<SearchingParts> by) {
         if (by.contains(SearchingParts.TITLE) && by.contains(SearchingParts.DIRECTOR)) {

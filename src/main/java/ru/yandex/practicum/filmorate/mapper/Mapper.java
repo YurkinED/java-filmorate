@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.mapper;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Mapper {
     public static Director makeDirector(ResultSet rs) throws SQLException {
@@ -52,4 +54,31 @@ public class Mapper {
         LocalDate birthday = rs.getDate("birthday").toLocalDate();
         return new User(id, email, login, name, birthday);
     }
+
+    public static Film makeFilm(SqlRowSet filmRows) {
+        int id = filmRows.getInt("film_id");
+        String name = filmRows.getString("film_name");
+        String description = filmRows.getString("description");
+        LocalDate releaseDate = Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate();
+        long duration = filmRows.getLong("duration");
+        int mpaId = filmRows.getInt("mpa_id");
+        String mpaName = filmRows.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(filmRows.getInt("rating"));
+        return film;
+    }
+
+    public static Film makeFilmFromRs(ResultSet rs) throws SQLException {
+        int id = rs.getInt("film_id");
+        String name = rs.getString("film_name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration");
+        int mpaId = rs.getInt("mpa_id");
+        String mpaName = rs.getString("mpa_name");
+        Film film = new Film(id, name, description, releaseDate, duration, new Mpa(mpaId, mpaName));
+        film.setRating(rs.getInt("rating"));
+        return film;
+    }
+
 }
