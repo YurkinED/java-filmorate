@@ -42,7 +42,7 @@ public class FriendDbStorage implements FriendStorage {
 
     @Override
     public List<User> showUserFriendsId(int userId) {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_FIND_FRIENDS_USER_BY_ID, (rs, rowNum) -> Mapper.makeUser(rs));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_FIND_FRIENDS_USER_BY_ID, (rs, rowNum) -> Mapper.makeUser(rs), userId);
     }
 
     @Override
