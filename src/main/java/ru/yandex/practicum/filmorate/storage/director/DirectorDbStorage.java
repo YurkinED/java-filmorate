@@ -12,9 +12,6 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Director;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.*;

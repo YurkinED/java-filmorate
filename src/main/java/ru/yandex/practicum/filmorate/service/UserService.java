@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.*;
 
@@ -20,7 +19,6 @@ import static org.junit.platform.commons.util.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    private final UserValidator userValidator;
     private final FeedStorage feedStorage;
 
     private final FriendStorage friendStorage;
@@ -86,7 +84,6 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        userValidator.validator(user);
         String name = user.getName();
 
         if (isBlank(name)) {
@@ -97,7 +94,6 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        userValidator.validator(user);
         return userStorage.updateUser(user);
     }
 

@@ -57,6 +57,15 @@ public class Mapper {
         return new User(id, email, login, name, birthday);
     }
 
+    public static User makeUser(SqlRowSet rs) {
+        int id = rs.getInt("user_id");
+        String email = rs.getString("email");
+        String login = rs.getString("login");
+        String name = rs.getString("name");
+        LocalDate birthday = rs.getDate("birthday").toLocalDate();
+        return new User(id, email, login, name, birthday);
+    }
+
     public static Film makeFilm(SqlRowSet filmRows) {
         int id = filmRows.getInt("film_id");
         String name = filmRows.getString("film_name");

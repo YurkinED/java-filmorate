@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
-import java.sql.SQLException;
 import java.util.*;
 
 
