@@ -23,8 +23,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.*
 @RequiredArgsConstructor
 public class FriendDbStorage implements FriendStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     @Override
     public boolean checkFriendshipExists(int userId, int friendId) {
         MapSqlParameterSource parameters = makeFriendsParameters(userId, friendId);
@@ -44,19 +42,7 @@ public class FriendDbStorage implements FriendStorage {
 
     @Override
     public List<User> showUserFriendsId(int userId) {
-        List<User> friendsList = new ArrayList<>();
-        SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_FRIENDS_BY_USER_ID, userId);
-        while (userRows.next()) {
-            int friendId = userRows.getInt("second_user_id");
-
-            SqlRowSet friendRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, friendId);
-            friendRows.first();
-            User user = Mapper.makeUserForFriends(friendRows);
-
-            friendsList.add(user);
-            log.info("В список друзей добавлен пользователь: {} {}", user.getId(), user.getName());
-        }
-        return friendsList;
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_FIND_FRIENDS_USER_BY_ID, (rs, rowNum) -> Mapper.makeUser(rs));
     }
 
     @Override

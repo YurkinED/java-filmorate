@@ -11,6 +11,9 @@ public class SqlQueryConstantsForUser {
     public static final String SQL_QUERY_FIND_USER_BY_ID = "SELECT user_id, email, login, name, birthday FROM users " +
             "WHERE user_id = ?";
 
+    public static final String SQL_QUERY_FIND_FRIENDS_USER_BY_ID = "SELECT user_id, email, login, name, birthday FROM users " +
+            "WHERE user_id IN (SELECT second_user_id FROM friends WHERE first_user_id = ?) ";
+
     public static final String SQL_QUERY_USER_EXISTS = "SELECT user_id, email, login, name, birthday FROM users " +
             "WHERE user_id = ?";
     public static final String SQL_QUERY_TAKE_FRIENDS_BY_USER_ID = "SELECT second_user_id FROM friends " +
