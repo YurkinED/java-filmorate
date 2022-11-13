@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -27,10 +25,6 @@ import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForUser.S
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final DirectorStorage directorStorage;
-
-    private final GenreStorage genreStorage;
-
 
     @Override
     public List<Film> findAllFilms() {
@@ -98,13 +92,6 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    @Override
-    public List<Film> findFilmsByDirectorAndSort(int directorId, String query) {
-        directorStorage.findDirectorById(directorId)
-                .orElseThrow(() -> new InvalidIdException("Нет режиссера с id " + directorId));
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(query,
-                (rs, rowNum) -> Mapper.makeFilmFromRs(rs),directorId);
-    }
 
     @Override
     public List<Film> commonLikedFilms(int userId, int friendId) {
