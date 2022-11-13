@@ -10,11 +10,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +32,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> findAllUsers() {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> makeUser(rs));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_USERS, (rs, rowNum) -> Mapper.makeUser(rs));
     }
 
     @Override
@@ -74,7 +72,7 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> findUserById(int userId) {
         SqlRowSet userRows = namedParameterJdbcTemplate.getJdbcTemplate().queryForRowSet(SQL_QUERY_FIND_USER_BY_ID, userId);
         if (userRows.next()) {
-            User user = makeUser(userRows);
+            User user = Mapper.makeUser(userRows);
             log.info("Найден пользователь: {} {}", user.getId(), user.getName());
             return Optional.of(user);
         } else {
@@ -96,23 +94,7 @@ public class UserDbStorage implements UserStorage {
         namedParameterJdbcTemplate.getJdbcTemplate().update(SQL_QUERY_DELETE_USER_BY_ID, userId);
     }
 
-    private User makeUser(ResultSet rs) throws SQLException {
-        int id = rs.getInt("user_id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return new User(id, email, login, name, birthday);
-    }
 
-    private User makeUser(SqlRowSet rs) {
-        int id = rs.getInt("user_id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return new User(id, email, login, name, birthday);
-    }
 
     private MapSqlParameterSource getUserParameters(User user) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();

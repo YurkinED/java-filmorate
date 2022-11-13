@@ -1,11 +1,7 @@
 package ru.yandex.practicum.filmorate.validators;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.filmExceptions.InvalidNameException;
-import ru.yandex.practicum.filmorate.exceptions.filmExceptions.LongDescriptionException;
-import ru.yandex.practicum.filmorate.exceptions.filmExceptions.NegativeDurationException;
 import ru.yandex.practicum.filmorate.exceptions.filmExceptions.ReleaseDateException;
-import ru.yandex.practicum.filmorate.model.BaseEntity;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;

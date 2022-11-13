@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,6 +26,7 @@ public class UserDbStorageTest {
 
     private final static LocalDate BIRTHDAY = LocalDate.of(1967, 3, 25);
     private final UserDbStorage userStorage;
+    private final FriendDbStorage friendStorage;
     private final FilmDbStorage filmDbStorage;
 
     @Test
@@ -91,8 +93,8 @@ public class UserDbStorageTest {
     @DisplayName("Тест на проверку наличия дружбы")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testCheckFriendshipExists() {
-        boolean trueFlag = userStorage.checkFriendshipExists(1, 2);
-        boolean falseFlag = userStorage.checkFriendshipExists(1, 4);
+        boolean trueFlag = friendStorage.checkFriendshipExists(1, 2);
+        boolean falseFlag = friendStorage.checkFriendshipExists(1, 4);
 
         assertTrue(trueFlag);
         assertFalse(falseFlag);
@@ -102,11 +104,11 @@ public class UserDbStorageTest {
     @DisplayName("Тест на добавление в друзья")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testAddToFriend() {
-        boolean flag = userStorage.checkFriendshipExists(1, 4);
+        boolean flag = friendStorage.checkFriendshipExists(1, 4);
         assertFalse(flag);
 
-        userStorage.addToFriend(1, 4);
-        flag = userStorage.checkFriendshipExists(1, 4);
+        friendStorage.addToFriend(1, 4);
+        flag = friendStorage.checkFriendshipExists(1, 4);
         assertTrue(flag);
     }
 
@@ -114,8 +116,8 @@ public class UserDbStorageTest {
     @DisplayName("Тест на поиск друзей по id")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testShowUserFriendsId() {
-        Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
-        Collection<User> friendsForUser4 = userStorage.showUserFriendsId(4);
+        List<User> friendsForUser1 = friendStorage.showUserFriendsId(1);
+        List<User> friendsForUser4 = friendStorage.showUserFriendsId(4);
 
         assertEquals(2, friendsForUser1.size());
         assertEquals(1, friendsForUser4.size());
@@ -126,8 +128,8 @@ public class UserDbStorageTest {
     @DisplayName("Тест на поиск общих друзей")
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testShowCommonFriends() {
-        Collection<User> commonFriends1And2 = userStorage.showCommonFriends(1, 2);
-        Collection<User> commonFriends2And4 = userStorage.showCommonFriends(2, 4);
+        List<User> commonFriends1And2 = friendStorage.showCommonFriends(1, 2);
+        List<User> commonFriends2And4 = friendStorage.showCommonFriends(2, 4);
 
         assertEquals(1, commonFriends1And2.size());
         assertEquals(1, commonFriends2And4.size());
@@ -136,9 +138,9 @@ public class UserDbStorageTest {
     @Test
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testDeleteUserByIdCheckAllUsers() {
-        Collection<User> users = userStorage.findAllUsers();
+        List<User> users = userStorage.findAllUsers();
         assertThat(users.size() == 4);
-        Collection<User> usersSecond = userStorage.findAllUsers();
+        List<User> usersSecond = userStorage.findAllUsers();
         userStorage.deleteUserById(1);
         assertThat(usersSecond.size() == 3);
     }
@@ -147,8 +149,8 @@ public class UserDbStorageTest {
     @Sql(scripts = {"file:src/main/resources/setupForTest.sql"})
     public void testDeleteUserByIdCheckFriends() {
         userStorage.deleteUserById(2);
-        Collection<User> friendsForUser1 = userStorage.showUserFriendsId(1);
-        boolean falseFlag = userStorage.checkFriendshipExists(1, 2);
+        List<User> friendsForUser1 = friendStorage.showUserFriendsId(1);
+        boolean falseFlag = friendStorage.checkFriendshipExists(1, 2);
         assertEquals(1, friendsForUser1.size());
         assertFalse(falseFlag);
     }

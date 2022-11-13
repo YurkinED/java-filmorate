@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
-import javax.validation.constraints.Positive;
 import java.util.Collection;
 
 @Slf4j

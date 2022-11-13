@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.userExceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -16,12 +15,11 @@ import java.util.*;
 @Deprecated
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
-    private final UserValidator userValidator;
     private int id;
 
     @Autowired
-    public InMemoryUserStorage(UserValidator userValidator) {
-        this.userValidator = userValidator;
+    public InMemoryUserStorage() {
+
     }
 
     public List<User> findAllUsers() {
@@ -39,7 +37,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User createUser(@Valid User user) {
         log.debug("Получен запрос POST /users.");
-        userValidator.validator(user);
         user.setId(incrementIdCounter());
         int id = user.getId();
         String name = user.getName();
@@ -57,7 +54,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User updateUser(@Valid User user) {
         log.debug("Получен запрос PUT /users.");
-        userValidator.validator(user);
         String name = user.getName();
         int id = user.getId();
         if (name == null || name.isBlank()) {
