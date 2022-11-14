@@ -1,32 +1,28 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.Mapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_ALL_MPA;
 import static ru.yandex.practicum.filmorate.constants.SqlQueryConstantsForFilm.SQL_QUERY_TAKE_MPA_BY_ID;
 
-@Component
+@Repository
+@RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @Autowired
-    public MpaDbStorage(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
-
     @Override
     public Collection<Mpa> findAllMpa() {
-        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_MPA, (rs, rowNum) -> makeMpa(rs));
+        return namedParameterJdbcTemplate.getJdbcTemplate().query(SQL_QUERY_TAKE_ALL_MPA, (rs, rowNum) -> Mapper.makeMpa(rs));
     }
 
     @Override
@@ -35,7 +31,7 @@ public class MpaDbStorage implements MpaStorage {
                 .getJdbcTemplate().queryForRowSet(SQL_QUERY_TAKE_MPA_BY_ID, mpaId);
         if (mpaRows.next()) {
             Mpa mpa = new Mpa(
-                    mpaRows.getInt("mpa_id_in_mpa"),
+                    mpaRows.getInt("mpa_id"),
                     mpaRows.getString("mpa_name"));
             return Optional.of(mpa);
         } else {
@@ -43,9 +39,4 @@ public class MpaDbStorage implements MpaStorage {
         }
     }
 
-    private Mpa makeMpa(ResultSet rs) throws SQLException {
-        int id = rs.getInt("mpa_id_in_mpa");
-        String name = rs.getString("mpa_name");
-        return new Mpa(id, name);
-    }
 }

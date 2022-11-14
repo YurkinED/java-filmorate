@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exceptions.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.Collection;
 
@@ -17,23 +16,23 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
-    private final GenreDbStorage genreDbStorage;
+    private final GenreService genreService;
 
     @Autowired
-    public GenreController(GenreDbStorage genreDbStorage) {
-        this.genreDbStorage = genreDbStorage;
+    public GenreController(GenreService genreService) {
+        this.genreService = genreService;
     }
 
     @GetMapping
     public Collection<Genre> findAllGenres() {
         log.debug("Получен запрос Get /genres. Получить все жанры.");
-        return genreDbStorage.findAllGenres();
+        return genreService.findAllGenres();
     }
 
     @GetMapping("/{genreId}")
-    public Genre getFilmById(@PathVariable int genreId) {
+    public Genre getGenreById(@PathVariable int genreId) {
         log.debug("Получен запрос Get /genres/{}. Найти жанр по genreId {}.", genreId, genreId);
-        return genreDbStorage.findGenreById(genreId).orElseThrow(
-                () -> new InvalidIdException("К сожалению, жанра с id " + genreId + " нет."));
+        return genreService.findGenreById(genreId).orElseThrow(
+                () -> new InvalidIdException("К сожалению, рейтинга с id " + genreId + " нет."));
     }
 }
